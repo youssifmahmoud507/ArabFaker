@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ArabFaker.NET/ArabFaker.NET.csproj" />
+  <Project Path="ArabFaker.Tests/ArabFaker.Tests.csproj" />
+</Solution>

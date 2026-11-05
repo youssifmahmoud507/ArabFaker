@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\Locations\Egypt\" />
+  </ItemGroup>
+	
+<ItemGroup>
+    <EmbeddedResource Include="Data\Locations\Egypt\all-governorate.json" LogicalName="ArabFaker.Data.Locations.Egypt.all-governorate.json" />
+
+    <EmbeddedResource Include="Data\Locations\Egypt\all-district.json" LogicalName="ArabFaker.Data.Locations.Egypt.all-district.json" />
+
+    <EmbeddedResource Include="Data\Locations\Egypt\all-shiyakha.json" LogicalName="ArabFaker.Data.Locations.Egypt.all-shiyakha.json" />
+</ItemGroup>
+
+</Project>
