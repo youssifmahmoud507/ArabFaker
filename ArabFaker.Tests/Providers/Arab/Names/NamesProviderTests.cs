@@ -140,6 +140,59 @@ namespace ArabFaker.Tests.Providers.Arab.Names
             Assert.Empty(name);
         }
 
+        [Theory]
+        [InlineData(NameLanguage.Arabic, NameGender.Male)]
+        [InlineData(NameLanguage.Arabic, NameGender.Female)]
+        [InlineData(NameLanguage.Latin, NameGender.Female)]
+        public void TryMiddleName_ShouldAlwaysBeAMaleName(NameLanguage language, NameGender gender)
+        {
+            var context = CreateContext();
+
+            var maleNames = NameCatalog.MaleFirstNames
+                .Select(entry => language == NameLanguage.Arabic ? entry.Arabic : entry.Latin)
+                .ToHashSet();
+
+            for (int i = 0; i < 500; i++)
+            {
+                bool success = context.Names.TryMiddleName(out var name, language, gender);
+
+                Assert.True(success);
+                Assert.Contains(name, maleNames);
+            }
+        }
+
+        [Theory]
+        [InlineData(NameGender.Any)]
+        [InlineData(NameGender.Male)]
+        [InlineData(NameGender.Female)]
+        public void TryFullName_MiddleNameShouldDifferFromFirstName(NameGender gender)
+        {
+            var context = CreateContext();
+
+            for (int i = 0; i < 2000; i++)
+            {
+                bool success = context.Names.TryFullName(out var fullName, NameLanguage.Latin, gender);
+
+                Assert.True(success);
+
+                string[] parts = fullName.Split(' ');
+
+                Assert.Equal(3, parts.Length);
+                Assert.NotEqual(parts[0], parts[1]);
+            }
+        }
+
+        [Fact]
+        public void TryMiddleName_InvalidGender_ShouldReturnFalse()
+        {
+            var context = CreateContext();
+
+            bool success = context.Names.TryMiddleName(out var name, NameLanguage.Arabic, (NameGender)999);
+
+            Assert.False(success);
+            Assert.Empty(name);
+        }
+
         private static GenerationContext CreateContext()
         {
             var factory = new RandomStreamFactory(2026);
