@@ -32,9 +32,18 @@
 
             decimal fraction = (decimal)NextDouble();
 
-            decimal inverse = 1m - fraction;
+            // Interpolate without ever producing an intermediate value outside the
+            // decimal range (which would raise OverflowException):
+            //  - same sign: min + (max - min) * fraction. The span (max - min) is
+            //    never larger than the larger magnitude, so it cannot overflow.
+            //  - opposite signs: min * (1 - fraction) + max * fraction. Both terms
+            //    are bounded by their operand and have opposite signs, so the sum
+            //    cannot overflow either.
+            bool sameSign = (minInclusive >= 0) == (maxInclusive >= 0);
 
-            decimal generatedValue = (minInclusive * inverse) + (maxInclusive * fraction);
+            decimal generatedValue = sameSign
+                ? minInclusive + ((maxInclusive - minInclusive) * fraction)
+                : (minInclusive * (1m - fraction)) + (maxInclusive * fraction);
 
             generatedValue = decimal.Round(generatedValue, decimalPlaces, MidpointRounding.AwayFromZero);
 

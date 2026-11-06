@@ -247,6 +247,79 @@ namespace ArabFaker.Tests.Generation
             }
         }
 
+        [Fact]
+        public void TryNextDecimal_FullDecimalRange_ShouldNotOverflow()
+        {
+            var random = CreateRandom();
+
+            for (int i = 0; i < 10_000; i++)
+            {
+                bool success = random.TryNextDecimal(decimal.MinValue, decimal.MaxValue, out decimal value, 2);
+
+                Assert.True(success);
+                Assert.InRange(value, decimal.MinValue, decimal.MaxValue);
+            }
+        }
+
+        [Fact]
+        public void TryNextDecimal_NarrowRangeAtMaxValue_ShouldStayInsideRange()
+        {
+            var random = CreateRandom();
+
+            decimal min = decimal.MaxValue - 1000m;
+
+            for (int i = 0; i < 10_000; i++)
+            {
+                bool success = random.TryNextDecimal(min, decimal.MaxValue, out decimal value, 0);
+
+                Assert.True(success);
+                Assert.InRange(value, min, decimal.MaxValue);
+            }
+        }
+
+        [Fact]
+        public void TryNextDecimal_NarrowRangeAtMinValue_ShouldStayInsideRange()
+        {
+            var random = CreateRandom();
+
+            decimal max = decimal.MinValue + 1000m;
+
+            for (int i = 0; i < 10_000; i++)
+            {
+                bool success = random.TryNextDecimal(decimal.MinValue, max, out decimal value, 0);
+
+                Assert.True(success);
+                Assert.InRange(value, decimal.MinValue, max);
+            }
+        }
+
+        [Fact]
+        public void TryNextDecimal_RangeCrossingZero_ShouldStayInsideRange()
+        {
+            var random = CreateRandom();
+
+            for (int i = 0; i < 10_000; i++)
+            {
+                bool success = random.TryNextDecimal(-50.5m, 75.25m, out decimal value, 2);
+
+                Assert.True(success);
+                Assert.InRange(value, -50.5m, 75.25m);
+            }
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(28)]
+        public void TryNextDecimal_BoundaryPrecision_ShouldSucceed(int decimalPlaces)
+        {
+            var random = CreateRandom();
+
+            bool success = random.TryNextDecimal(1m, 2m, out decimal value, decimalPlaces);
+
+            Assert.True(success);
+            Assert.InRange(value, 1m, 2m);
+        }
+
         private static int GetDecimalPlaces(decimal value)
         {
             return (decimal.GetBits(value)[3] >> 16) & 0xFF;

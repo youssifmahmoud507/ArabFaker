@@ -56,18 +56,7 @@ namespace ArabFaker.NET.Providers.Common.Random
         /// <param name="value">The generated boolean value.</param>
         public bool TryBoolean(double trueProbability, out bool value)
         {
-            value = default;
-
-            if (!double.IsFinite(trueProbability) ||
-                trueProbability < 0 ||
-                trueProbability > 1)
-            {
-                return false;
-            }
-
-            value = _random.NextDouble() < trueProbability;
-
-            return true;
+            return _random.TryNextBoolean(trueProbability, out value);
         }
 
         /// <summary>

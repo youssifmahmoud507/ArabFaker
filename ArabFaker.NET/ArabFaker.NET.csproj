@@ -6,10 +6,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Data\Locations\Egypt\" />
-  </ItemGroup>
-	
 <ItemGroup>
     <EmbeddedResource Include="Data\Locations\Egypt\all-governorate.json" LogicalName="ArabFaker.Data.Locations.Egypt.all-governorate.json" />
 
