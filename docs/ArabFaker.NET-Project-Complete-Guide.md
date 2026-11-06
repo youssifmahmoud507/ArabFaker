@@ -2,7 +2,7 @@
 
 > **وثيقة تعريف وتصميم وتنفيذ (Project Vision, Product Specification & Technical Architecture)**  
 > آخر تجميع للمعلومات: **5 نوفمبر 2026**  
-> الحالة: **المشروع قيد التطوير — أول 10 أجزاء موجودة فعليًا في الريبو (تمت مراجعتها يدويًا في 6 نوفمبر 2026). ملفات الجزء 11 (`FakerDefinition.cs`) غير موجودة في الريبو بعد، والجزء 11 هو المرحلة الحالية.**
+> الحالة: **المشروع قيد التطوير — أول 10 أجزاء موجودة فعليًا في الريبو (تمت مراجعتها يدويًا في 6 نوفمبر 2026). الجزء 11 (`Define<T>` و`RuleFor`) تم تنفيذه في فرع `feature/part-11-define-rulefor` وينتظر نتيجة `dotnet build` و`dotnet test` من صاحب المشروع.**
 
 ---
 
@@ -1526,7 +1526,7 @@ The dataset provider does not endorse ArabFaker.NET.
 | 8 | Locations Provider | بيانات مصر وعلاقاتها | مكتمل؛ تم إصلاح Embedded Resources والاختبارات نجحت |
 | 9 | Text Provider | توليد نصوص ومجموعات أحرف | مكتمل حسب تأكيد المستخدم |
 | 10 | Main Builder & Public API | Faker وPublic Generators | مكتمل حسب تأكيد المستخدم |
-| 11 | Define<T> & RuleFor | تعريف أي Class وقواعد Properties | المرحلة الحالية؛ يلزم تثبيت Step 1 ومراجعة Step 2 |
+| 11 | Define<T> & RuleFor | تعريف أي Class وقواعد Properties | منفّذ بالكامل (Steps 1–3) في فرع feature؛ ينتظر تأكيد الاختبارات |
 | 12 | Generate / Generate(count) / GenerateLazy & Result Handling | تنفيذ التوليد وإرجاع النتائج | لم يبدأ حسب آخر تصحيح من المستخدم |
 | 13 | Docs, Benchmarks, NuGet & Release | توثيق وقياس ونشر | لم يبدأ |
 
@@ -1659,6 +1659,30 @@ Part 11 — Define<T>() & RuleFor()
 - افحص ملفات المستخدم الحالية قبل إرسال Replacement كامل.
 - لا تفترض أن Step 1 أو Step 2 تم دمجهما بنجاح لمجرد أنهما أُرسلا في المحادثة.
 - ابدأ من الملفات الموجودة فعليًا، وحدد ما ينقصها فقط.
+
+### تنفيذ Part 11 (6 نوفمبر 2026)
+
+الملفات المضافة في `ArabFaker.NET/Generation/`:
+
+| الملف | الدور |
+|---|---|
+| `ConfigurationError.cs` | `record ConfigurationError(Code, Message)` |
+| `ConfigurationErrorCodes.cs` | أكواد أخطاء ثابتة (`Faker.NullFactory`, `Faker.FieldNotSupported`, ...) |
+| `PropertySelectorAnalyzer.cs` | فحص الـ Selector (Internal) |
+| `FakerDefinition.cs` | `FakerDefinition<T>`: `RuleFor`, `Freeze`, `ConfigurationErrors`, `IsValid`, `RuleCount`, `IsFrozen` |
+| `Faker.cs` (معدّل) | `Define<T>()` و`Define<T>(Func<T>)` وتخصيص Scope داخل `lock` |
+
+قرارات التصميم:
+
+- **لا توجد `throw` في المكتبة:** الأخطاء تُجمع في `ConfigurationErrors`، والـ Rule غير الصالحة تُتجاهل ويستمر الـ Fluent chain.
+- **Scope:** كل Definition يحصل على `definition/{ulongId}` بترتيب الاستدعاء (حتى لو فشل إعداده). الاستقرار مرتبط بترتيب `Define`.
+- **Duplicate Rules:** آخر Rule تكسب وتحتفظ بمكان الأولى في الترتيب. الترتيب = ترتيب أول تسجيل.
+- **المدعوم:** Public instance property بـ public setter، حتى لو موروثة، ونوعها يطابق `TProperty` تمامًا (بما فيها `string?` و`int?`).
+- **المرفوض بكود خطأ:** Null selector/factory، Field، Nested/Computed، Static، Indexer، Method call/Conversion، No/private setter، init-only، Type mismatch.
+- **Freeze():** idempotent. بعده يتم تجاهل أي `RuleFor` ويُسجَّل `Faker.DefinitionFrozen` (وبالتالي `IsValid` تصبح false). التجميد يلقط نسخة ثابتة من الـ Rules للاستخدام المتزامن.
+- **Exceptions المستخدم:** تمر كما هي (لا يوجد catch). سياسة تحويلها إلى `GenerationError` تُحسم في Part 12.
+- **الواجهات الداخلية للجزء 12:** `TryCreateInstance`, `CreateContext(ulong)`, `ApplyRules` (Internal) تستخدمها الاختبارات وPart 12.
+- **غير مدعوم عمدًا:** Fields، Nested objects، init-only/private setters. `Expression.Compile()` لم يُختبر مع Native AOT.
 
 ## 28.3 Part 12
 
@@ -1850,7 +1874,9 @@ Part 11 — Define<T>() & RuleFor()
 
 أول 10 Parts اعتبرها صاحب المشروع مكتملة.
 
-العمل المطلوب حاليًا:
+**تحديث 6 نوفمبر 2026:** Part 11 منفّذ. الخطوة التالية بعد نجاح الاختبارات: Part 12 Step 1 (`GenerationResult` و`GenerationError`).
+
+(نص تاريخي قبل التنفيذ) العمل المطلوب كان:
 
 1. مراجعة الكود المحلي الحالي لـ `Faker.cs` و`FakerDefinition.cs` قبل أي تعديل جديد.
 2. التأكد من اكتمال Step 1: `Define<T>()` وDefault/Custom Factory وScope.
