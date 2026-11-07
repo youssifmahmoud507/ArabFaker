@@ -307,8 +307,9 @@ ArabFaker/
 │   │   ├── IdGenerator.cs
 │   │   ├── FakerContext.cs                 (Public Facade Context)
 │   │   ├── FakerDefinition.cs              (Part 11)
-│   │   ├── GenerationError.cs              (planned for Part 12)
-│   │   ├── GenerationResult.cs             (planned for Part 12)
+│   │   ├── GenerationError.cs              (Part 12)
+│   │   ├── GenerationErrorCodes.cs         (Part 12)
+│   │   ├── GenerationResult.cs             (Part 12)
 │   │   │
 │   │   ├── Randomization/
 │   │   │   ├── IRandomSource.cs
@@ -1686,7 +1687,31 @@ Part 11 — Define<T>() & RuleFor()
 
 ## 28.3 Part 12
 
-لم يبدأ بعد وفق تصحيح صاحب المشروع. لا تعتبر أي كود GenerationResult/Generate تمت مشاركته في رد سابق جزءًا معتمدًا من المشروع إلا إذا أكد المستخدم أنه طبقه واختبره. البداية الرسمية تكون بعد إغلاق Part 11.
+### تنفيذ Part 12 (7 نوفمبر 2026)
+
+الملفات: `GenerationError.cs` و`GenerationErrorCodes.cs` و`GenerationResult.cs` وإضافات في `FakerDefinition.cs`، والاختبارات في `ArabFaker.Tests/Generation/FakerGenerateTests.cs`.
+
+الواجهة:
+
+```csharp
+GenerationResult<T> Generate();
+GenerationResult<IReadOnlyList<T>> Generate(int count);
+IEnumerable<GenerationResult<T>> GenerateLazy(int count);
+```
+
+القرارات التي حُسمت (كانت مفتوحة في §18):
+
+- **`GenerationResult<T>`:** `IsSuccess` و`Value` (يكون `null` عند الفشل) و`Errors` (قائمة للقراءة فقط، نسخة ثابتة). لا يُرجع الفشل أي Object جزئي أبدًا.
+- **الأكواد:** `Faker.InvalidDefinition` (واحد لكل `ConfigurationError` ورسالته تبدأ بكود الأصل) و`Faker.FactoryReturnedNull` و`Faker.InvalidCount` و`Faker.ItemIndexExhausted`.
+- **Exceptions المستخدم:** تمر كما هي بدون `catch`. `GenerationResult` للأخطاء المتوقعة فقط.
+- **Freeze تلقائي:** أول `Generate*` ناجح في التحقق يجمّد الـ Definition (حسب §21). Definition غير الصالحة لا تُجمَّد.
+- **Item Index:** عدّاد لكل Definition (0، 1، 2، ...) ويحدد وحده قيم الـ Random. `Generate(count)` تحجز نطاقًا متصلًا من الـ Indices في خطوة ذرية واحدة، فالنداءات المتزامنة لا تتشارك Index. أي أن `Generate(10)` تعطي نفس نتيجة 10 نداءات `Generate()` على نفس الـ Seed.
+- **`Generate(count)`:** All-or-nothing. `count < 0` أو Definition غير صالحة تفشل قبل استهلاك أي Index. `count == 0` ينجح بقائمة فارغة. لو فشل عنصر في المنتصف تبقى الـ Indices المحجوزة مستهلكة.
+- **`GenerateLazy(count)`:** لا يبدأ التوليد قبل الـ Enumeration، وكل عنصر `GenerationResult` مستقل، وفشل عنصر لا يوقف التسلسل. إعادة الـ Enumeration تكمل من Indices جديدة (تعطي Objects مختلفة). الـ Count السالب أو Definition غير صالحة أو نفاد الـ Indices تعطي Result فاشلة واحدة ثم ينتهي التسلسل.
+- **التزامن:** الـ Index لا يتكرر أبدًا، لكن أي Thread يحصل على أي Index يتبع الجدولة. للربط الصريح بين Index والنتيجة يلزم `GenerateAt(index)` مستقبلًا (غير مضاف).
+- **خارج النطاق عمدًا:** `HasKey`، سجل Definitions داخل `Faker`، `After(...)`، Unique/Null chance. تُضاف في أجزاء لاحقة كما في خريطة الطريق.
+
+**ملاحظة:** لم يُشغَّل `dotnet build/test` على هذا الجزء في بيئة الكتابة؛ المراجعة يدوية، والتأكيد النهائي يكون بتشغيل الاختبارات محليًا.
 
 # 29. قرارات مؤجلة ومخاطر يجب مراجعتها
 
@@ -1874,7 +1899,7 @@ Part 11 — Define<T>() & RuleFor()
 
 أول 10 Parts اعتبرها صاحب المشروع مكتملة.
 
-**تحديث 6 نوفمبر 2026:** Part 11 منفّذ. الخطوة التالية بعد نجاح الاختبارات: Part 12 Step 1 (`GenerationResult` و`GenerationError`).
+**تحديث 7 نوفمبر 2026:** Part 11 مدموج. Part 12 (`Generate` و`Generate(count)` و`GenerateLazy` و`GenerationResult`) منفّذ في branch `feature/part-12-generate` وينتظر نجاح الاختبارات محليًا.
 
 (نص تاريخي قبل التنفيذ) العمل المطلوب كان:
 
