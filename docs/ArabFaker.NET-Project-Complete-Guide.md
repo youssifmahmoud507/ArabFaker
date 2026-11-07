@@ -1732,6 +1732,28 @@ IEnumerable<GenerationResult<T>> GenerateLazy(int count);
 - Nullable تُملأ بقيمة دائمًا (لا Null chance حاليًا). الأنواع غير المدعومة (Classes، Collections، ...) تُترك وتُذكر في `UnmappedProperties`.
 - **لم يُشغَّل `dotnet build/test`** في بيئة الكتابة؛ المراجعة يدوية.
 
+## 28.5 Part 14 (Dataset والعلاقات) — خطة وتنفيذ 7 نوفمبر 2026
+
+الفكرة: طبقة منفصلة فوق `Define/Generate`، فالكلاس المنفرد يبقى بسيطًا ولا يحتاج Dataset. الجداول المترابطة تُولَّد معًا بحيث لا يوجد Foreign Key يشير لسجل غير موجود.
+
+الملفات (`ArabFaker.NET/Dataset/`): `DatasetBuilder.cs` و`DatasetTable.cs` و`GeneratedDataset.cs` و`ITableRuntime.cs` (Internal). إضافات: `Faker.CreateDataset()` و`CreateRandom` (Internal) وأكواد أخطاء جديدة. الاختبارات: `ArabFaker.Tests/Dataset/`.
+
+الواجهة: `dataset.Table(definition, rowCount, x => x.Id)` ثم `.ForeignKey(x => x.StudentId, students, nullChance)` و`.SelfReference(x => x.ManagerId, roots)` و`.UniqueTogether(a, b[, c])`، ثم `Build()` تعيد `GenerationResult<GeneratedDataset>` و`Rows(table)` لقراءة الصفوف.
+
+قرارات التصميم:
+
+- **مرحلتان:** (1) توليد كل صفوف كل الجداول عبر `Definition.Generate(count)`، والتحقق من أن المفاتيح غير Null وغير مكررة. (2) تعبئة العلاقات من مفاتيح الصفوف الموجودة فعلًا. لذلك لا يلزم ترتيب Topological، ويمكن لجدولين الإشارة لبعضهما (كسر الحلقات تلقائي).
+- **المفتاح:** تأتي قيمته من الـ Definition نفسها (`AutoFill` تعطي `Id` تسلسليًا أو GUID). المكرر يفشل بـ `Faker.DuplicateKey`.
+- **قيم الـ FK** تستبدل أي قيمة أنتجتها الـ Definition للـ Property. نوع الـ Property يجب أن يساوي نوع مفتاح الأب أو الـ Nullable منه.
+- **Optional FK:** `nullChance` بين 0 و1 ويتطلب Property تقبل Null.
+- **الهرمية:** أول `roots` صفوف بدون أب، وكل صف بعدها يشير لصف يسبقه، فالنتيجة غابة بدون دورات وبدون أب مفقود.
+- **N:M:** `UniqueTogether` على FKs مسجلة مسبقًا وبدون Null. اختيار عشوائي بمحاولات متعددة ثم مسح خطي من نقطة عشوائية للحالة الكثيفة. لو الصفوف أكثر من عدد التوليفات يفشل `Build` قبل توليد أي شيء (`Faker.UniqueConstraintUnsatisfiable`).
+- **أب فارغ:** صفوف في الابن وأب بلا صفوف تفشل بـ `Faker.EmptyParentTable` (إلا مع `nullChance: 1`).
+- **أخطاء الإعداد** لا تُرمى: تُجمع في `ConfigurationErrors` وتفشل `Build` بـ `Faker.InvalidDefinition`.
+- **Determinism:** كل اختيار يأتي من Stream باسم `dataset/{id}/t{table}/{property}` وIndex الصف، فنفس الـ Seed ونفس ترتيب الإنشاء يعطي نفس العلاقات. `Build` مرة ثانية تولد صفوفًا جديدة (الـ Definitions تكمل العد).
+- **غير مدعوم عمدًا الآن:** مفتاح مركب، مفتاح هو نفسه FK (Shared PK)، One-to-one، توزيع غير منتظم للأبناء، Navigation Properties (Parent object / Collections)، Export (SQL/JSON/EF) — أجزاء لاحقة.
+- **لم يُشغَّل `dotnet build/test`** في بيئة الكتابة؛ المراجعة يدوية.
+
 # 29. قرارات مؤجلة ومخاطر يجب مراجعتها
 
 هذه النقاط لا تعني أن المشروع فاشل؛ لكنها أمور مهمة قبل نشر مكتبة عامة.

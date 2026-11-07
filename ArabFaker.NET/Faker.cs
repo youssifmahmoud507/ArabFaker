@@ -1,3 +1,4 @@
+using ArabFaker.NET.Dataset;
 using ArabFaker.NET.Generation;
 using ArabFaker.NET.Generation.Randomization;
 using System.Globalization;
@@ -18,6 +19,8 @@ namespace ArabFaker.NET
         private readonly object _definitionLock = new();
 
         private ulong _nextDefinitionId;
+
+        private ulong _nextDatasetId;
 
         private bool _definitionIdsExhausted;
 
@@ -68,6 +71,27 @@ namespace ArabFaker.NET
             }
 
             return CreateDefinition(factory, []);
+        }
+
+        /// <summary>
+        /// Starts a dataset: several related tables generated together so every foreign key
+        /// points to a row that exists.
+        /// </summary>
+        /// <remarks>
+        /// Like definitions, datasets get a random scope in call order, so create them in the
+        /// same order for the same seed.
+        /// </remarks>
+        /// <returns>An empty dataset builder.</returns>
+        public DatasetBuilder CreateDataset()
+        {
+            ulong id = Interlocked.Increment(ref _nextDatasetId) - 1;
+
+            return new DatasetBuilder(this, id);
+        }
+
+        internal RandomGenerator CreateRandom(string streamKey, ulong itemIndex)
+        {
+            return new RandomGenerator(_streamFactory.Create(streamKey, itemIndex));
         }
 
         internal GenerationContext CreateContext(string scopeKey, ulong itemIndex)

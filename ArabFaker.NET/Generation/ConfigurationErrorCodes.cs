@@ -44,6 +44,36 @@ namespace ArabFaker.NET.Generation
         /// <summary>The options passed to <c>AutoFill</c> are null or contain an invalid value.</summary>
         public const string InvalidAutoFillOptions = "Faker.InvalidAutoFillOptions";
 
+        /// <summary>A dataset table was registered with a null definition.</summary>
+        public const string NullDefinition = "Faker.NullDefinition";
+
+        /// <summary>The same definition was added to a dataset more than once.</summary>
+        public const string DuplicateTable = "Faker.DuplicateTable";
+
+        /// <summary>A dataset table has a negative row count.</summary>
+        public const string InvalidRowCount = "Faker.InvalidRowCount";
+
+        /// <summary>The foreign key points to a table that is null, from another dataset, or the table itself.</summary>
+        public const string ForeignKeyTargetInvalid = "Faker.ForeignKeyTargetInvalid";
+
+        /// <summary>The foreign key property type does not match the referenced key type.</summary>
+        public const string ForeignKeyTypeMismatch = "Faker.ForeignKeyTypeMismatch";
+
+        /// <summary>The property is already a foreign key or is the table's own key.</summary>
+        public const string ForeignKeyPropertyConflict = "Faker.ForeignKeyPropertyConflict";
+
+        /// <summary>The property cannot hold null but the relation needs null values.</summary>
+        public const string ForeignKeyNotNullable = "Faker.ForeignKeyNotNullable";
+
+        /// <summary>The null chance is not a number between 0 and 1.</summary>
+        public const string InvalidNullChance = "Faker.InvalidNullChance";
+
+        /// <summary>The number of root rows of a self reference is less than 1.</summary>
+        public const string InvalidRoots = "Faker.InvalidRoots";
+
+        /// <summary>The unique group is not made of distinct, registered, non-null foreign keys.</summary>
+        public const string InvalidUniqueGroup = "Faker.InvalidUniqueGroup";
+
         /// <summary>No more definition scopes can be allocated.</summary>
         public const string DefinitionIdExhausted = "Faker.DefinitionIdExhausted";
     }

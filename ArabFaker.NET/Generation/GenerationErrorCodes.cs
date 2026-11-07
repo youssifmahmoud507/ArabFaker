@@ -19,5 +19,17 @@ namespace ArabFaker.NET.Generation
 
         /// <summary>The definition has no item indices left to hand out.</summary>
         public const string ItemIndexExhausted = "Faker.ItemIndexExhausted";
+
+        /// <summary>A dataset table's key is null.</summary>
+        public const string NullKey = "Faker.NullKey";
+
+        /// <summary>Two rows of a dataset table have the same key.</summary>
+        public const string DuplicateKey = "Faker.DuplicateKey";
+
+        /// <summary>A table has rows but the table it references has none.</summary>
+        public const string EmptyParentTable = "Faker.EmptyParentTable";
+
+        /// <summary>There are more rows than distinct combinations a unique group allows.</summary>
+        public const string UniqueConstraintUnsatisfiable = "Faker.UniqueConstraintUnsatisfiable";
     }
 }
