@@ -22,12 +22,22 @@ namespace ArabFaker.NET.Generation
     /// </para>
     /// <para>
     /// Configuration methods are thread-safe. Call <see cref="Freeze"/> once configuration is
-    /// complete; later <c>RuleFor</c> calls are ignored and reported as errors.
+    /// complete; later <c>RuleFor</c> calls are ignored and reported as errors. The first
+    /// successful call to <see cref="Generate()"/>, <see cref="Generate(int)"/> or
+    /// <see cref="GenerateLazy"/> freezes the definition automatically.
+    /// </para>
+    /// <para>
+    /// Every generated object gets the next item index of this definition (0, 1, 2, ...), and the
+    /// index alone decides its random values. The same <see cref="Faker"/> seed, definition order,
+    /// rules and call order therefore always produce the same objects. Concurrent calls are safe
+    /// and never share an index, but which thread receives which index follows scheduling.
     /// </para>
     /// </remarks>
     /// <typeparam name="T">The type of object this definition produces.</typeparam>
     public sealed class FakerDefinition<T> where T : class
     {
+        private static readonly UInt128 MaxIndexExclusive = (UInt128)ulong.MaxValue + 1UL;
+
         private readonly object _syncRoot = new();
 
         private readonly Faker _faker;
@@ -40,7 +50,12 @@ namespace ArabFaker.NET.Generation
 
         private readonly List<ConfigurationError> _errors = [];
 
+        private readonly object _indexLock = new();
+
         private PropertyRule[]? _frozenRules;
+
+        // UInt128 so that "all 2^64 indices used" is representable without overflow tricks.
+        private UInt128 _nextIndex;
 
         internal FakerDefinition(
             Faker faker,
@@ -190,6 +205,88 @@ namespace ArabFaker.NET.Generation
             return this;
         }
 
+        /// <summary>
+        /// Generates one object.
+        /// </summary>
+        /// <remarks>
+        /// On failure no object is returned, so a half-filled instance never leaks out.
+        /// An item index is consumed even if the factory then returns null.
+        /// </remarks>
+        /// <returns>A successful result with the object, or a failed result with errors.</returns>
+        public GenerationResult<T> Generate()
+        {
+            if (!TryPrepare(out GenerationError[] errors))
+                return GenerationResult<T>.Failure(errors);
+
+            if (!TryReserveIndices(1, out ulong index))
+                return GenerationResult<T>.Failure(ExhaustedError());
+
+            return GenerateAt(index);
+        }
+
+        /// <summary>
+        /// Generates <paramref name="count"/> objects, all or nothing.
+        /// </summary>
+        /// <remarks>
+        /// A negative count or an invalid definition fails before any item index is used.
+        /// If one item fails, the whole call fails and returns no objects; the indices it
+        /// reserved stay used. A count of zero succeeds with an empty list.
+        /// </remarks>
+        /// <param name="count">How many objects to generate.</param>
+        /// <returns>A successful result with a read-only list, or a failed result with errors.</returns>
+        public GenerationResult<IReadOnlyList<T>> Generate(int count)
+        {
+            if (count < 0)
+                return GenerationResult<IReadOnlyList<T>>.Failure(InvalidCountError(count));
+
+            if (!TryPrepare(out GenerationError[] errors))
+                return GenerationResult<IReadOnlyList<T>>.Failure(errors);
+
+            if (count == 0)
+                return GenerationResult<IReadOnlyList<T>>.Success(Array.Empty<T>());
+
+            if (!TryReserveIndices((ulong)count, out ulong firstIndex))
+                return GenerationResult<IReadOnlyList<T>>.Failure(ExhaustedError());
+
+            var items = new T[count];
+
+            for (int i = 0; i < count; i++)
+            {
+                GenerationResult<T> item = GenerateAt(firstIndex + (ulong)i);
+
+                if (!item.IsSuccess)
+                    return GenerationResult<IReadOnlyList<T>>.Failure(item.Errors);
+
+                items[i] = item.Value;
+            }
+
+            return GenerationResult<IReadOnlyList<T>>.Success(items);
+        }
+
+        /// <summary>
+        /// Generates <paramref name="count"/> objects one at a time while the sequence is enumerated.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Nothing is generated until enumeration starts. Each element is an independent result, so a
+        /// failed item does not stop the sequence. Enumerating the sequence again continues with fresh
+        /// item indices and therefore yields different objects.
+        /// </para>
+        /// <para>
+        /// A negative count, an invalid definition or exhausted indices yield a single failed
+        /// result and end the sequence.
+        /// </para>
+        /// </remarks>
+        /// <param name="count">How many objects to generate.</param>
+        /// <returns>A lazy sequence of results.</returns>
+        public IEnumerable<GenerationResult<T>> GenerateLazy(int count)
+        {
+            if (count < 0)
+                return [GenerationResult<T>.Failure(InvalidCountError(count))];
+
+            return GenerateLazyCore(count);
+        }
+
         internal bool TryCreateInstance([NotNullWhen(true)] out T? instance)
         {
             instance = null;
@@ -200,6 +297,15 @@ namespace ArabFaker.NET.Generation
             instance = _factory();
 
             return instance is not null;
+        }
+
+        // Lets tests reach the end of the index space without generating 2^64 objects.
+        internal void SetNextIndexForTesting(UInt128 nextIndex)
+        {
+            lock (_indexLock)
+            {
+                _nextIndex = nextIndex;
+            }
         }
 
         internal FakerContext CreateContext(ulong itemIndex)
@@ -213,6 +319,103 @@ namespace ArabFaker.NET.Generation
             {
                 rule.Apply(instance, context);
             }
+        }
+
+        private IEnumerable<GenerationResult<T>> GenerateLazyCore(int count)
+        {
+            if (!TryPrepare(out GenerationError[] errors))
+            {
+                yield return GenerationResult<T>.Failure(errors);
+
+                yield break;
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                if (!TryReserveIndices(1, out ulong index))
+                {
+                    yield return GenerationResult<T>.Failure(ExhaustedError());
+
+                    yield break;
+                }
+
+                yield return GenerateAt(index);
+            }
+        }
+
+        private GenerationResult<T> GenerateAt(ulong itemIndex)
+        {
+            if (!TryCreateInstance(out T? instance))
+            {
+                return GenerationResult<T>.Failure(new GenerationError(
+                    GenerationErrorCodes.FactoryReturnedNull,
+                    $"The factory for '{typeof(T).Name}' returned null."));
+            }
+
+            ApplyRules(instance, CreateContext(itemIndex));
+
+            return GenerationResult<T>.Success(instance);
+        }
+
+        private bool TryPrepare(out GenerationError[] errors)
+        {
+            ConfigurationError[] configurationErrors;
+
+            lock (_syncRoot)
+            {
+                configurationErrors = _errors.ToArray();
+            }
+
+            if (configurationErrors.Length > 0)
+            {
+                errors = configurationErrors
+                    .Select(error => new GenerationError(
+                        GenerationErrorCodes.InvalidDefinition,
+                        $"{error.Code}: {error.Message}"))
+                    .ToArray();
+
+                return false;
+            }
+
+            Freeze();
+
+            errors = [];
+
+            return true;
+        }
+
+        private bool TryReserveIndices(ulong count, out ulong firstIndex)
+        {
+            lock (_indexLock)
+            {
+                UInt128 end = _nextIndex + count;
+
+                if (end > MaxIndexExclusive)
+                {
+                    firstIndex = 0;
+
+                    return false;
+                }
+
+                firstIndex = (ulong)_nextIndex;
+                _nextIndex = end;
+
+                return true;
+            }
+        }
+
+        private static GenerationError ExhaustedError()
+        {
+            return new GenerationError(
+                GenerationErrorCodes.ItemIndexExhausted,
+                "This definition has no item indices left.");
+        }
+
+        private static GenerationError InvalidCountError(int count)
+        {
+            return new GenerationError(
+                GenerationErrorCodes.InvalidCount,
+                $"The count must be zero or greater, but was {count}.");
         }
 
         private PropertyRule[] GetRules()

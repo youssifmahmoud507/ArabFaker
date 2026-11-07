@@ -6,7 +6,7 @@ ArabFaker only gives you reproducible building blocks to fill them.
 
 > **Status: under development (pre-release).** Parts 1–10 of the plan are implemented
 > (randomization engine, seeds/streams, providers, `Faker` + `FakerContext`).
-> `Define<T>() / RuleFor()` (Part 11) is implemented; `Generate()` (Part 12) is not available yet.
+> `Define<T>() / RuleFor()` (Part 11) and `Generate()` / `Generate(count)` / `GenerateLazy()` (Part 12) are implemented.
 > No NuGet package has been published.
 
 ## Highlights
@@ -28,6 +28,29 @@ var students = faker.Define<Student>()
 
 // Invalid rules never throw; check students.IsValid / students.ConfigurationErrors.
 ```
+
+## Generating objects (Part 12)
+
+```csharp
+GenerationResult<Student> one = students.Generate();
+
+if (one.IsSuccess)
+    Console.WriteLine(one.Value.FirstName);
+else
+    foreach (GenerationError error in one.Errors)
+        Console.WriteLine($"{error.Code}: {error.Message}");
+
+GenerationResult<IReadOnlyList<Student>> many = students.Generate(100); // all or nothing
+
+foreach (GenerationResult<Student> item in students.GenerateLazy(1_000)) // generated while enumerating
+{
+    // each item has its own result
+}
+```
+
+The same seed, definitions, rules and call order always produce the same objects.
+The first `Generate*` call freezes the definition. Exceptions thrown by your own
+factories and rules are not caught.
 
 ## Not for security use
 

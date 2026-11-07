@@ -371,12 +371,24 @@ namespace ArabFaker.Tests.Generation
         }
 
         [Fact]
-        public void RuleFor_SelectorWithConversion_ShouldReportError()
+        public void RuleFor_SelectorWithBoxingConversion_ShouldReportError()
         {
+            // int -> object is a boxing conversion, so the compiler wraps the property in Convert(...).
+            var definition = new Faker(2026).Define<DefinitionStudent>()
+                .RuleFor<object>(x => x.Age, _ => 1);
+
+            AssertSingleError(definition, ConfigurationErrorCodes.UnsupportedSelector);
+        }
+
+        [Fact]
+        public void RuleFor_ReferenceTypeWidenedToObject_ShouldReportTypeMismatch()
+        {
+            // string -> object is a reference conversion: the compiler adds no Convert node,
+            // so the selector is a plain property access whose type differs from TProperty.
             var definition = new Faker(2026).Define<DefinitionStudent>()
                 .RuleFor<object>(x => x.FirstName, _ => "A");
 
-            AssertSingleError(definition, ConfigurationErrorCodes.UnsupportedSelector);
+            AssertSingleError(definition, ConfigurationErrorCodes.PropertyTypeMismatch);
         }
 
         [Fact]
