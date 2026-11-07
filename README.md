@@ -6,7 +6,7 @@ ArabFaker only gives you reproducible building blocks to fill them.
 
 > **Status: under development (pre-release).** Parts 1–10 of the plan are implemented
 > (randomization engine, seeds/streams, providers, `Faker` + `FakerContext`).
-> `Define<T>() / RuleFor()` (Part 11) and `Generate()` / `Generate(count)` / `GenerateLazy()` (Part 12) are implemented.
+> `Define<T>() / RuleFor()` (Part 11) `Generate()` / `Generate(count)` / `GenerateLazy()` (Part 12) and `AutoFill()` (Part 13) are implemented.
 > No NuGet package has been published.
 
 ## Highlights
@@ -51,6 +51,24 @@ foreach (GenerationResult<Student> item in students.GenerateLazy(1_000)) // gene
 The same seed, definitions, rules and call order always produce the same objects.
 The first `Generate*` call freezes the definition. Exceptions thrown by your own
 factories and rules are not caught.
+
+## Filling properties automatically (Part 13)
+
+```csharp
+var people = faker.Define<Person>()
+    .AutoFill()                                   // fills what it can recognise
+    .RuleFor(x => x.Name, c => "Custom");         // explicit rules always win
+
+people.UnmappedProperties; // properties AutoFill did not touch (e.g. "CustomerId")
+```
+
+`AutoFill` fills properties by name and type: first/last/full names, e-mail, username,
+governorate/city, `Age`, dates of birth, numbers, booleans, enums and GUIDs. A property named
+`Id` gets 1, 2, 3, ... (or a GUID). It deliberately does **not** guess foreign keys such as
+`CustomerId`, a bare `Name`, or unrecognised strings, so you never get meaningless data: those
+are listed in `UnmappedProperties` and are meant to be handled by explicit rules (and, later,
+by relations). Dates are computed from a fixed `AutoFillOptions.ReferenceDate`, never from the
+real clock.
 
 ## Not for security use
 

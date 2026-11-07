@@ -18,6 +18,10 @@ namespace ArabFaker.NET.Generation
     /// already has one replaces the earlier rule (the last rule wins) and keeps its position.
     /// </para>
     /// <para>
+    /// <see cref="AutoFill()"/> registers rules for the properties that have none yet, based on
+    /// their name and type. An explicit <c>RuleFor</c> always wins, whether it comes before or after.
+    /// </para>
+    /// <para>
     /// Exceptions thrown by user supplied factories and rules are not caught by the library.
     /// </para>
     /// <para>
@@ -53,6 +57,8 @@ namespace ArabFaker.NET.Generation
         private readonly object _indexLock = new();
 
         private PropertyRule[]? _frozenRules;
+
+        private string[] _unmappedProperties = [];
 
         // UInt128 so that "all 2^64 indices used" is representable without overflow tricks.
         private UInt128 _nextIndex;
@@ -115,6 +121,21 @@ namespace ArabFaker.NET.Generation
         /// Gets a value indicating whether the definition is frozen and no longer accepts rules.
         /// </summary>
         public bool IsFrozen => Volatile.Read(ref _frozenRules) is not null;
+
+        /// <summary>
+        /// Gets the names of writable properties that the latest <c>AutoFill</c> call could not fill
+        /// and that have no explicit rule. Give these a <c>RuleFor</c>. The list is a snapshot.
+        /// </summary>
+        public IReadOnlyList<string> UnmappedProperties
+        {
+            get
+            {
+                lock (_syncRoot)
+                {
+                    return _unmappedProperties.ToArray();
+                }
+            }
+        }
 
         internal string ScopeKey { get; }
 
@@ -185,6 +206,106 @@ namespace ArabFaker.NET.Generation
                     _ruleIndexes[property.Name] = _rules.Count;
                     _rules.Add(rule);
                 }
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Fills every public writable property that has no rule yet, using its name and type,
+        /// with default <see cref="AutoFillOptions"/>.
+        /// </summary>
+        /// <returns>This definition.</returns>
+        public FakerDefinition<T> AutoFill()
+        {
+            return AutoFill(new AutoFillOptions());
+        }
+
+        /// <summary>
+        /// Fills every public writable property that has no rule yet, using its name and type.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Properties are processed in name order so results do not depend on reflection order.
+        /// Properties that already have a rule are left alone, so call <c>RuleFor</c> before or after
+        /// as you like. Calling <c>AutoFill</c> again never replaces an existing rule.
+        /// </para>
+        /// <para>
+        /// A property named <c>Id</c> of type <see cref="int"/>, <see cref="long"/>, <see cref="Guid"/>
+        /// or <see cref="string"/> gets a unique value per item (1, 2, 3, ... for numbers). Foreign-key-like
+        /// names (<c>CustomerId</c>), a bare <c>Name</c> and unrecognised strings are not guessed;
+        /// see <see cref="UnmappedProperties"/>.
+        /// </para>
+        /// </remarks>
+        /// <param name="options">The settings to use.</param>
+        /// <returns>This definition.</returns>
+        public FakerDefinition<T> AutoFill(AutoFillOptions options)
+        {
+            if (options is null)
+            {
+                AddErrors([new ConfigurationError(
+                    ConfigurationErrorCodes.InvalidAutoFillOptions,
+                    "The auto-fill options cannot be null.")]);
+
+                return this;
+            }
+
+            if (!options.TryValidate(out string message))
+            {
+                AddErrors([new ConfigurationError(ConfigurationErrorCodes.InvalidAutoFillOptions, message)]);
+
+                return this;
+            }
+
+            var candidates = new List<(PropertyInfo Property, Action<T, FakerContext>? Apply)>();
+
+            foreach (PropertyInfo property in typeof(T)
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(PropertySelectorAnalyzer.IsPubliclyWritable)
+                .OrderBy(candidate => candidate.Name, StringComparer.Ordinal))
+            {
+                Action<T, FakerContext>? apply = null;
+
+                if (ConventionCatalog.TryCreateFactory(property, options, out Func<FakerContext, object?>? factory))
+                {
+                    Action<T, object?> setter = CompileObjectSetter(property);
+
+                    apply = (instance, context) => setter(instance, factory(context));
+                }
+
+                candidates.Add((property, apply));
+            }
+
+            lock (_syncRoot)
+            {
+                if (_frozenRules is not null)
+                {
+                    _errors.Add(new ConfigurationError(
+                        ConfigurationErrorCodes.DefinitionFrozen,
+                        "AutoFill was ignored because the definition is frozen."));
+
+                    return this;
+                }
+
+                var unmapped = new List<string>();
+
+                foreach ((PropertyInfo property, Action<T, FakerContext>? apply) in candidates)
+                {
+                    if (_ruleIndexes.ContainsKey(property.Name))
+                        continue;
+
+                    if (apply is null)
+                    {
+                        unmapped.Add(property.Name);
+
+                        continue;
+                    }
+
+                    _ruleIndexes[property.Name] = _rules.Count;
+                    _rules.Add(new PropertyRule(property.Name, apply));
+                }
+
+                _unmappedProperties = unmapped.ToArray();
             }
 
             return this;
@@ -437,6 +558,19 @@ namespace ArabFaker.NET.Generation
             {
                 _errors.AddRange(errors);
             }
+        }
+
+        private static Action<T, object?> CompileObjectSetter(PropertyInfo property)
+        {
+            ParameterExpression instance = Expression.Parameter(typeof(T), "instance");
+
+            ParameterExpression value = Expression.Parameter(typeof(object), "value");
+
+            BinaryExpression assignment = Expression.Assign(
+                Expression.Property(instance, property),
+                Expression.Convert(value, property.PropertyType));
+
+            return Expression.Lambda<Action<T, object?>>(assignment, instance, value).Compile();
         }
 
         private static Action<T, TProperty> CompileSetter<TProperty>(PropertyInfo property)

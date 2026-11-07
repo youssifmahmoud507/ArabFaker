@@ -310,6 +310,8 @@ ArabFaker/
 │   │   ├── GenerationError.cs              (Part 12)
 │   │   ├── GenerationErrorCodes.cs         (Part 12)
 │   │   ├── GenerationResult.cs             (Part 12)
+│   │   ├── AutoFillOptions.cs              (Part 13)
+│   │   ├── ConventionCatalog.cs            (Part 13, internal)
 │   │   │
 │   │   ├── Randomization/
 │   │   │   ├── IRandomSource.cs
@@ -1712,6 +1714,23 @@ IEnumerable<GenerationResult<T>> GenerateLazy(int count);
 - **خارج النطاق عمدًا:** `HasKey`، سجل Definitions داخل `Faker`، `After(...)`، Unique/Null chance. تُضاف في أجزاء لاحقة كما في خريطة الطريق.
 
 **ملاحظة:** لم يُشغَّل `dotnet build/test` على هذا الجزء في بيئة الكتابة؛ المراجعة يدوية، والتأكيد النهائي يكون بتشغيل الاختبارات محليًا.
+
+## 28.4 Part 13 (Conventions / AutoFill) — خطة وتنفيذ 7 نوفمبر 2026
+
+ملاحظة ترقيم: الـ Guide الأصلي يسمي "Part 13" مرحلة الإصدار (Docs/NuGet). تم تأجيلها ليصبح الترقيم الفعلي: Part 13 = Conventions، ثم Dataset والعلاقات، ثم الـ Adapters، ثم الإصدار.
+
+الملفات: `AutoFillOptions.cs` و`ConventionCatalog.cs` (Internal) وإضافات في `FakerDefinition.cs` و`FakerContext.ItemIndex` وكود خطأ `Faker.InvalidAutoFillOptions`. الاختبارات: `AutoFillTests.cs` و`AutoFillTestModels.cs`.
+
+القرارات:
+
+- `AutoFill()` تسجل Rules فقط للـ Properties التي ليس لها Rule، فالـ `RuleFor` الصريحة تكسب قبل أو بعد، وتكرار `AutoFill` لا يستبدل شيئًا. بعد `Freeze` يتم تجاهلها وتسجيل `DefinitionFrozen`.
+- الترتيب بالاسم (Ordinal) لأن ترتيب Reflection غير مضمون، ولأن الـ Providers تتشارك Stream واحدًا لكل Item فالترتيب يؤثر على القيم.
+- **لا تخمين:** `Name` المجردة وأي String غير معروف وأي مفتاح أجنبي (`CustomerId`) تبقى بدون قيمة وتظهر في `UnmappedProperties`. الهدف منع بيانات بلا معنى؛ المفاتيح الأجنبية مسؤولية طبقة Dataset.
+- **`Id`:** int/long يأخذان `ItemIndex + 1` (يبدأ من 1)، وGuid/string يأخذان GUID. الـ Property التي ينتهي اسمها بـ `Id` بحرف I كبير (أو `ID`) تُعتبر مفتاحًا ولا تُملأ (فـ `Paid` عادية).
+- **التواريخ:** لا تعتمد على الساعة الحقيقية؛ تُحسب من `AutoFillOptions.ReferenceDate` (الافتراضي 2026-01-01) لضمان Reproducibility.
+- `FakerContext.ItemIndex` أصبح Public لخدمة المفاتيح التسلسلية والـ Rules المخصصة.
+- Nullable تُملأ بقيمة دائمًا (لا Null chance حاليًا). الأنواع غير المدعومة (Classes، Collections، ...) تُترك وتُذكر في `UnmappedProperties`.
+- **لم يُشغَّل `dotnet build/test`** في بيئة الكتابة؛ المراجعة يدوية.
 
 # 29. قرارات مؤجلة ومخاطر يجب مراجعتها
 
