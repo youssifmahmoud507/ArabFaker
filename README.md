@@ -6,7 +6,7 @@ ArabFaker only gives you reproducible building blocks to fill them.
 
 > **Status: under development (pre-release).** Parts 1–10 of the plan are implemented
 > (randomization engine, seeds/streams, providers, `Faker` + `FakerContext`).
-> `Define<T>() / RuleFor()` (Part 11) `Generate()` / `Generate(count)` / `GenerateLazy()` (Part 12) and `AutoFill()` (Part 13) are implemented.
+> `Define<T>() / RuleFor()` (Part 11) `Generate()` / `Generate(count)` / `GenerateLazy()` (Part 12) `AutoFill()` (Part 13) and datasets with relations (Part 14) are implemented.
 > No NuGet package has been published.
 
 ## Highlights
@@ -69,6 +69,36 @@ governorate/city, `Age`, dates of birth, numbers, booleans, enums and GUIDs. A p
 are listed in `UnmappedProperties` and are meant to be handled by explicit rules (and, later,
 by relations). Dates are computed from a fixed `AutoFillOptions.ReferenceDate`, never from the
 real clock.
+
+## Related tables without orphans (Part 14)
+
+```csharp
+var faker = new Faker(2026);
+var dataset = faker.CreateDataset();
+
+var students = dataset.Table(faker.Define<Student>().AutoFill(), 100, x => x.Id);
+var courses  = dataset.Table(faker.Define<Course>().AutoFill(), 20, x => x.Id);
+var enrollments = dataset.Table(faker.Define<Enrollment>().AutoFill(), 400, x => x.Id)
+    .ForeignKey(x => x.StudentId, students)
+    .ForeignKey(x => x.CourseId, courses)
+    .UniqueTogether(x => x.StudentId, x => x.CourseId);   // one enrollment per pair
+
+var employees = dataset.Table(faker.Define<Employee>().AutoFill(), 50, x => x.Id)
+    .SelfReference(x => x.ManagerId);                      // hierarchy, no cycles
+
+GenerationResult<GeneratedDataset> result = dataset.Build();
+
+if (result.IsSuccess)
+{
+    IReadOnlyList<Enrollment> rows = result.Value.Rows(enrollments);
+}
+```
+
+Every foreign key points to a row that exists in the same dataset. Tables can be listed in any
+order and may even reference each other. Foreign keys can be optional (`nullChance`, on a
+nullable property), and a mistake in the setup (wrong type, duplicate relation, too many rows for a
+unique group, an empty parent table, duplicate keys) is reported as an error before or instead of
+producing data. A single class with no relations needs none of this: use `Define<T>().Generate()`.
 
 ## Not for security use
 
