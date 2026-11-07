@@ -41,6 +41,9 @@ namespace ArabFaker.NET.Generation
         /// <summary>A rule was added after the definition was frozen.</summary>
         public const string DefinitionFrozen = "Faker.DefinitionFrozen";
 
+        /// <summary>The options passed to <c>AutoFill</c> are null or contain an invalid value.</summary>
+        public const string InvalidAutoFillOptions = "Faker.InvalidAutoFillOptions";
+
         /// <summary>No more definition scopes can be allocated.</summary>
         public const string DefinitionIdExhausted = "Faker.DefinitionIdExhausted";
     }

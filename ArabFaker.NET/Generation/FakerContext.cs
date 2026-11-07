@@ -49,6 +49,10 @@ namespace ArabFaker.NET.Generation
         /// </summary>
         public IdentifierGenerator Identifiers { get; }
 
+        /// <summary>
+        /// Gets the zero-based index of the item being generated within its definition.
+        /// </summary>
+        public ulong ItemIndex { get; }
 
         internal FakerContext(GenerationContext context)
         {
@@ -59,6 +63,7 @@ namespace ArabFaker.NET.Generation
             Locations = new LocationsGenerator(context.Locations);
             RandomData = new RandomDataGenerator(context.Random);
             Identifiers = new IdentifierGenerator(context.Ids);
+            ItemIndex = context.ItemIndex;
         }
     }
 }

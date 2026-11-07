@@ -142,6 +142,19 @@ namespace ArabFaker.NET.Generation
             return true;
         }
 
+        /// <summary>
+        /// Returns true for a public instance property with a public, non init-only setter and no index parameters.
+        /// </summary>
+        internal static bool IsPubliclyWritable(PropertyInfo property)
+        {
+            if (property.GetIndexParameters().Length > 0)
+                return false;
+
+            MethodInfo? setter = property.GetSetMethod(nonPublic: false);
+
+            return setter is not null && !setter.IsStatic && !IsInitOnly(setter);
+        }
+
         private static bool IsInitOnly(MethodInfo setter)
         {
             foreach (Type modifier in setter.ReturnParameter.GetRequiredCustomModifiers())
