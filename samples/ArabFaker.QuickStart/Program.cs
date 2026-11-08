@@ -1,38 +1,75 @@
 using ArabFaker.NET;
 using ArabFaker.NET.Export;
+using ArabFaker.NET.Generation;
+using ArabFaker.NET.Providers.Arab.Names;
 using System.Text;
+
+// Usage: dotnet run --project samples/ArabFaker.QuickStart -- [--latin] [--dialect sqlserver|standard|mysql] [--out <folder>]
+//   --latin     names in English letters (Mohamed Ahmed) instead of Arabic script
+//   --dialect   SQL flavour of dataset.sql (default: sqlserver)
+//   --out       where to write the files (default: ./quickstart-output)
 
 Console.OutputEncoding = Encoding.UTF8;
 
+var language = NameLanguage.Arabic;
+var dialect = SqlDialect.SqlServer;
+string outputFolder = Path.Combine(Directory.GetCurrentDirectory(), "quickstart-output");
+
+for (int i = 0; i < args.Length; i++)
+{
+    switch (args[i])
+    {
+        case "--latin":
+            language = NameLanguage.Latin;
+            break;
+
+        case "--dialect" when i + 1 < args.Length:
+            string requested = args[++i];
+
+            if (requested.Equals("sqlserver", StringComparison.OrdinalIgnoreCase))
+                dialect = SqlDialect.SqlServer;
+            else if (requested.Equals("standard", StringComparison.OrdinalIgnoreCase))
+                dialect = SqlDialect.Standard;
+            else if (requested.Equals("mysql", StringComparison.OrdinalIgnoreCase))
+                dialect = SqlDialect.MySql;
+            else
+                return Fail($"Unknown dialect '{requested}'. Use sqlserver, standard or mysql.");
+
+            break;
+
+        case "--out" when i + 1 < args.Length:
+            outputFolder = Path.GetFullPath(args[++i]);
+            break;
+
+        default:
+            return Fail($"Unknown argument '{args[i]}'.");
+    }
+}
+
+var autoFill = new AutoFillOptions { Language = language };
 var faker = new Faker(seed: 2026);
 
 // 1) One class, no relations: define, fill by convention, generate.
-var people = faker.Define<Person>().AutoFill().Generate(3);
+var people = faker.Define<Person>().AutoFill(autoFill).Generate(10);
 
 if (!people.IsSuccess)
-{
-    foreach (var error in people.Errors)
-        Console.Error.WriteLine($"{error.Code}: {error.Message}");
-
-    return 1;
-}
-
-Console.WriteLine("People (CSV):");
-Console.WriteLine(RowExporter.ToCsv(people.Value).Value);
+    return Fail(people.Errors);
 
 // 2) Related tables: every foreign key points to a row that exists.
 var dataset = faker.CreateDataset();
 
-var students = dataset.Table(faker.Define<Student>().AutoFill(), 5, x => x.Id);
+var students = dataset.Table(faker.Define<Student>().AutoFill(autoFill), 8, x => x.Id);
+
+string[] titles = ["Algebra", "Physics", "Databases", "Networks"];
 
 var courses = dataset.Table(
     faker.Define<Course>()
-        .AutoFill()
-        .RuleFor(x => x.Title, c => c.RandomData.TryPick(new[] { "Algebra", "Physics", "Databases" }, out var title) ? title : "Course"),
-    3,
+        .AutoFill(autoFill)
+        .RuleFor(x => x.Title, c => titles[(int)(c.ItemIndex % (ulong)titles.Length)]),
+    titles.Length,
     x => x.Id);
 
-dataset.Table(faker.Define<Enrollment>().AutoFill(), 8, x => x.Id)
+dataset.Table(faker.Define<Enrollment>().AutoFill(autoFill), 20, x => x.Id)
     .ForeignKey(x => x.StudentId, students)
     .ForeignKey(x => x.CourseId, courses)
     .UniqueTogether(x => x.StudentId, x => x.CourseId);
@@ -40,17 +77,52 @@ dataset.Table(faker.Define<Enrollment>().AutoFill(), 8, x => x.Id)
 var built = dataset.Build();
 
 if (!built.IsSuccess)
+    return Fail(built.Errors);
+
+// 3) Write everything as UTF-8 files, so the console font and code page do not matter.
+Directory.CreateDirectory(outputFolder);
+
+var utf8 = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+var utf8WithBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true); // Excel needs the BOM for Arabic CSV.
+
+var files = new List<(string Name, GenerationResult<string> Content, Encoding Encoding)>
 {
-    foreach (var error in built.Errors)
-        Console.Error.WriteLine($"{error.Code}: {error.Message}");
+    ("people.csv", RowExporter.ToCsv(people.Value), utf8WithBom),
+    ("people.json", RowExporter.ToJson(people.Value), utf8),
+    ("dataset.json", built.Value.ToJson(), utf8),
+    ("dataset.sql", built.Value.ToSql(new SqlExportOptions { Dialect = dialect }), utf8)
+};
+
+foreach (var (name, content, encoding) in files)
+{
+    if (!content.IsSuccess)
+        return Fail(content.Errors);
+
+    string path = Path.Combine(outputFolder, name);
+
+    File.WriteAllText(path, content.Value, encoding);
+    Console.WriteLine(path);
+}
+
+Console.WriteLine();
+Console.WriteLine($"Language: {language}, SQL dialect: {dialect}. Open the files in an editor that supports UTF-8 (for example VS Code).");
+
+return 0;
+
+static int Fail(string message)
+{
+    Console.Error.WriteLine(message);
 
     return 1;
 }
 
-Console.WriteLine("Dataset (SQL Server INSERT script, referenced tables first):");
-Console.WriteLine(built.Value.ToSql(new SqlExportOptions { Dialect = SqlDialect.SqlServer }).Value);
+static int Fail(IEnumerable<GenerationError> errors)
+{
+    foreach (var error in errors)
+        Console.Error.WriteLine($"{error.Code}: {error.Message}");
 
-return 0;
+    return 1;
+}
 
 internal sealed class Person
 {

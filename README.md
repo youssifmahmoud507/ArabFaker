@@ -16,7 +16,7 @@ Not on NuGet yet. Until a package is published, add a project reference:
 dotnet add reference path/to/ArabFaker.NET/ArabFaker.NET.csproj
 ```
 
-A runnable example lives in `samples/ArabFaker.QuickStart` (`dotnet run --project samples/ArabFaker.QuickStart`).
+A runnable example lives in `samples/ArabFaker.QuickStart` (`dotnet run --project samples/ArabFaker.QuickStart -- --latin`). It writes UTF-8 files to `quickstart-output/`; add `--latin` for English-letter names.
 
 ## What it is, and what it is not
 
