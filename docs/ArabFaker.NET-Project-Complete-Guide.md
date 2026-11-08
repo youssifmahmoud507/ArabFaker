@@ -1754,6 +1754,17 @@ IEnumerable<GenerationResult<T>> GenerateLazy(int count);
 - **غير مدعوم عمدًا الآن:** مفتاح مركب، مفتاح هو نفسه FK (Shared PK)، One-to-one، توزيع غير منتظم للأبناء، Navigation Properties (Parent object / Collections)، Export (SQL/JSON/EF) — أجزاء لاحقة.
 - **لم يُشغَّل `dotnet build/test`** في بيئة الكتابة؛ المراجعة يدوية.
 
+## 28.6 Part 15 (Navigation Properties) — خطة وتنفيذ 8 نوفمبر 2026
+
+يربط كائنات الأب والأبناء ببعضها بعد ملء الـ FK، بدون أي عشوائية جديدة (فلا يتغير أي FK).
+
+- `table.Navigation(x => x.StudentId, x => x.Student)`: يملأ الـ Property بنفس Instance الأب الموجود في الـ Dataset. FK الـ Null يعطي Navigation بـ Null. يتطلب FK مسجلًا مسبقًا ونوعًا يقبل نوع صف الأب (أو Base له).
+- `table.Collection(x => x.Enrollments, child, c => c.StudentId)`: يملأ كل صف أب بقائمة أبنائه (قائمة فارغة وليست Null عند عدم وجود أبناء). نوع الـ Property يجب أن يقبل `List<T>` (`List`, `ICollection`, `IList`, `IEnumerable`, `IReadOnlyList`). `HashSet` وغيره غير مدعوم (خطأ `Faker.NavigationTypeMismatch`).
+- الهرمية: `employees.Collection(x => x.Reports, employees, x => x.ManagerId)` مع `Navigation` لـ `Manager`.
+- أخطاء: `NavigationForeignKeyMissing` و`NavigationTypeMismatch` و`NavigationPropertyConflict` و`NavigationTargetInvalid`. تُجمع في `ConfigurationErrors` ولا تُرمى.
+- الـ Property يجب أن تكون Writable (نفس قاعدة `RuleFor`). الرسم الناتج دائري (الأب يشير للأبناء والعكس) فالـ Serialization يحتاج إعداد Cycle-aware.
+- **لم يُشغَّل `dotnet build/test`** في بيئة الكتابة؛ المراجعة يدوية.
+
 # 29. قرارات مؤجلة ومخاطر يجب مراجعتها
 
 هذه النقاط لا تعني أن المشروع فاشل؛ لكنها أمور مهمة قبل نشر مكتبة عامة.
