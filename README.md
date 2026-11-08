@@ -6,7 +6,7 @@ ArabFaker only gives you reproducible building blocks to fill them.
 
 > **Status: under development (pre-release).** Parts 1–10 of the plan are implemented
 > (randomization engine, seeds/streams, providers, `Faker` + `FakerContext`).
-> `Define<T>() / RuleFor()` (Part 11) `Generate()` / `Generate(count)` / `GenerateLazy()` (Part 12) `AutoFill()` (Part 13) datasets with relations (Part 14) and navigation properties (Part 15) are implemented.
+> `Define<T>() / RuleFor()` (Part 11) `Generate()` / `Generate(count)` / `GenerateLazy()` (Part 12) `AutoFill()` (Part 13) datasets with relations (Part 14) navigation properties (Part 15) and export (Part 16) are implemented.
 > No NuGet package has been published.
 
 ## Highlights
@@ -110,6 +110,26 @@ employees.Collection(x => x.Reports, employees, x => x.ManagerId);       // hier
 Navigation objects point to the very same instances that are in the dataset, and every parent gets a
 list (empty if nothing references it). Both directions refer to each other, so serialise with a
 cycle-aware setting. A single class with no relations needs none of this: use `Define<T>().Generate()`.
+
+## Exporting data (Part 16)
+
+```csharp
+var rows = faker.Define<Student>().AutoFill().Generate(100).Value!;
+
+string json = RowExporter.ToJson(rows).Value!;
+string csv  = RowExporter.ToCsv(rows).Value!;
+string sql  = RowExporter.ToSql(rows, new SqlExportOptions { Dialect = SqlDialect.SqlServer }).Value!;
+
+// A whole dataset: INSERT statements with referenced tables first, or one JSON object per table.
+string script = generated.ToSql().Value!;
+string all    = generated.ToJson().Value!;
+```
+
+Only public read/write scalar properties are written (text, numbers, booleans, GUIDs, dates, enums);
+navigation objects and collections are skipped, so cyclic graphs export fine. Output never depends on
+the machine culture, Arabic text stays readable in JSON, and SQL Server output uses `N'...'` literals.
+Tables that reference each other cannot be ordered and are written in registration order.
+Problems are returned as errors (`result.Errors`), never thrown.
 
 ## Not for security use
 

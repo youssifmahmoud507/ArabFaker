@@ -31,5 +31,20 @@ namespace ArabFaker.NET.Generation
 
         /// <summary>There are more rows than distinct combinations a unique group allows.</summary>
         public const string UniqueConstraintUnsatisfiable = "Faker.UniqueConstraintUnsatisfiable";
+
+        /// <summary>The rows passed to an exporter are null.</summary>
+        public const string NullRows = "Faker.NullRows";
+
+        /// <summary>One of the rows passed to an exporter is null.</summary>
+        public const string NullRow = "Faker.NullRow";
+
+        /// <summary>The row type has no public read/write scalar property to export.</summary>
+        public const string NoExportableColumns = "Faker.NoExportableColumns";
+
+        /// <summary>The export options are invalid.</summary>
+        public const string InvalidExportOptions = "Faker.InvalidExportOptions";
+
+        /// <summary>Two tables of a dataset would be exported under the same name.</summary>
+        public const string DuplicateTableName = "Faker.DuplicateTableName";
     }
 }
