@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    name: Build and test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build (Release)
+        run: dotnet build --configuration Release --no-restore -p:ContinuousIntegrationBuild=true
+
+      - name: Test
+        run: dotnet test --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" --results-directory TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}
+          path: TestResults
+
+  package:
+    name: Pack and smoke test
+    needs: build-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Pack
+        run: dotnet pack ArabFaker.NET/ArabFaker.NET.csproj --configuration Release -p:ContinuousIntegrationBuild=true --output artifacts
+
+      - name: Check package contents
+        run: |
+          package=$(ls artifacts/*.nupkg | head -n 1)
+          echo "Package: $package"
+          unzip -l "$package"
+          for expected in README.md LICENSE.txt THIRD-PARTY-NOTICES.md lib/net10.0/ArabFaker.NET.dll lib/net10.0/ArabFaker.NET.xml; do
+            unzip -l "$package" | grep -q "$expected" || { echo "Missing $expected in package"; exit 1; }
+          done
+          if unzip -l "$package" | grep -qi "Tests"; then
+            echo "Test artifacts found in package"; exit 1
+          fi
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkg
+          path: artifacts/*.nupkg
+
+      - name: Run the quick-start sample
+        run: dotnet run --project samples/ArabFaker.QuickStart/ArabFaker.QuickStart.csproj --configuration Release

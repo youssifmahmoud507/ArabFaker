@@ -1779,6 +1779,17 @@ IEnumerable<GenerationResult<T>> GenerateLazy(int count);
 - غير مدعوم الآن: أسماء جداول/أعمدة مخصصة، Batch Insert، Identity Insert، CREATE TABLE، EF Core Seeding (أجزاء لاحقة).
 - **لم يُشغَّل `dotnet build/test`** في بيئة الكتابة؛ المراجعة يدوية.
 
+## 28.8 Part 17 (Release readiness) — 8 نوفمبر 2026
+
+يغطي من Part 13 الأصلي: Package metadata، CI، Sample، Changelog، README النهائي. **لم يتم النشر**، والنشر يحتاج موافقة صاحب المشروع.
+
+- `ArabFaker.NET.csproj`: `PackageId` و`Version` (`0.1.0-preview.1`) و`Authors` و`Description` و`PackageTags` و`PackageLicenseExpression=MIT` و`PackageReadmeFile` و`RepositoryUrl`، مع تضمين `README.md` و`LICENSE.txt` و`THIRD-PARTY-NOTICES.md` في الحزمة، و`GenerateDocumentationFile` (ملف XML داخل الحزمة).
+- `.github/workflows/ci.yml`: Build وTest بـ Release على Ubuntu وWindows، ثم Job للـ Pack يفحص محتوى الحزمة (README وLICENSE وNOTICES والـ DLL وملف XML، وعدم وجود Test artifacts) ويشغل الـ Sample. هذا هو أول فحص آلي لا يعتمد على جهاز المستخدم.
+- `samples/ArabFaker.QuickStart`: برنامج Console يستخدم `Define/AutoFill/Generate` و`Dataset` مع `UniqueTogether` و`ToSql`. أُضيف إلى `ArabFaker.slnx`.
+- `CHANGELOG.md` وأقسام Installation وWhat it is/is not في README.
+- **مؤجل:** Benchmarks (تحتاج BenchmarkDotNet)، SourceLink، التحقق من توفر Package ID `ArabFaker.NET` على nuget.org، مراجعة Public API النهائية، النشر.
+- **لم يُشغَّل `dotnet build/test/pack`** في بيئة الكتابة؛ أول تشغيل فعلي سيكون من CI أو من جهازك.
+
 # 29. قرارات مؤجلة ومخاطر يجب مراجعتها
 
 هذه النقاط لا تعني أن المشروع فاشل؛ لكنها أمور مهمة قبل نشر مكتبة عامة.
