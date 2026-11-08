@@ -4,7 +4,30 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
+
+  <!-- NuGet package metadata. Nothing has been published; the package ID must be checked on nuget.org first. -->
+  <PropertyGroup>
+    <PackageId>ArabFaker.NET</PackageId>
+    <Version>0.1.0-preview.1</Version>
+    <Authors>Youssef Mahmoud</Authors>
+    <Description>Deterministic fake data for .NET with Arabic names and Egyptian administrative locations. Define generators for your own classes, generate related tables without orphan foreign keys, and export to JSON, CSV or SQL.</Description>
+    <PackageTags>fake-data;test-data;faker;arabic;egypt;seed;dataset;testing</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/youssifmahmoud507/ArabFaker</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/youssifmahmoud507/ArabFaker</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Copyright>Copyright (c) 2026 Youssef Mahmoud</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\LICENSE.txt" Pack="true" PackagePath="\" />
+    <None Include="..\THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 <ItemGroup>
     <EmbeddedResource Include="Data\Locations\Egypt\all-governorate.json" LogicalName="ArabFaker.Data.Locations.Egypt.all-governorate.json" />

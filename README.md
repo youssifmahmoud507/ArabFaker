@@ -4,10 +4,26 @@ A .NET library for generating **fake / synthetic test data**, with first-class s
 for Arabic names and Egyptian administrative locations. You keep your own classes;
 ArabFaker only gives you reproducible building blocks to fill them.
 
-> **Status: under development (pre-release).** Parts 1–10 of the plan are implemented
-> (randomization engine, seeds/streams, providers, `Faker` + `FakerContext`).
-> `Define<T>() / RuleFor()` (Part 11) `Generate()` / `Generate(count)` / `GenerateLazy()` (Part 12) `AutoFill()` (Part 13) datasets with relations (Part 14) navigation properties (Part 15) and export (Part 16) are implemented.
-> No NuGet package has been published.
+> **Status: pre-release (`0.1.0-preview.1`).** Generators, `Generate*`, `AutoFill`, datasets with
+> relations, navigation properties and export are implemented and covered by tests. The public API
+> may still change before `1.0.0`. No NuGet package has been published yet; see `CHANGELOG.md`.
+
+## Installation
+
+Not on NuGet yet. Until a package is published, add a project reference:
+
+```
+dotnet add reference path/to/ArabFaker.NET/ArabFaker.NET.csproj
+```
+
+A runnable example lives in `samples/ArabFaker.QuickStart` (`dotnet run --project samples/ArabFaker.QuickStart`).
+
+## What it is, and what it is not
+
+- It **is** a test-data library: deterministic, offline, dependency-free, Arabic- and Egypt-aware.
+- It is **not** a cryptographic or security tool: seeds make output predictable, identifiers are not
+  secrets, and generated emails/names are fake and for testing only.
+- It does not connect to databases or APIs. It produces objects, JSON, CSV and SQL scripts that you load yourself.
 
 ## Highlights
 
