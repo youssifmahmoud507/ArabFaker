@@ -30,7 +30,8 @@ A runnable example lives in `samples/ArabFaker.QuickStart` (`dotnet run --projec
 - Target framework: `net10.0`, no runtime dependencies, works offline.
 - Seeded, reproducible output with independent random streams per provider.
 - Providers: names (Arabic/Latin), internet (test-only emails), dates, locations (Egypt),
-  text, random values, identifiers (UUID v4).
+  text, random values, identifiers (UUID v4), and built-in reference lists (courses, departments,
+  job titles, universities, banks, medical specialties, countries, ...).
 - No `throw`-based validation: providers use the `Try...` pattern.
 
 ## Defining a generator (Part 11)
@@ -85,6 +86,31 @@ governorate/city, `Age`, dates of birth, numbers, booleans, enums and GUIDs. A p
 are listed in `UnmappedProperties` and are meant to be handled by explicit rules (and, later,
 by relations). Dates are computed from a fixed `AutoFillOptions.ReferenceDate`, never from the
 real clock.
+
+## Reference data (Part 20)
+
+Closed, well-known lists ship with the library, in Arabic or English: 200 courses grouped under
+20 academic departments, 105 job titles under 15 company departments, faculties, Egyptian
+universities, industries, product categories, payment methods, banks, medical specialties,
+countries, languages, colors, blood types, currency codes, weekdays and months.
+
+```csharp
+var faker = new Faker(2026);
+
+var courses = faker.Define<Course>()
+    .AutoFill()                                   // CourseName, Department, University... are recognised
+    .RuleFor(x => x.Title, c => c.Reference.TryCourse(out var t) ? t : "Course")
+    .Generate(10);
+
+// A value that must agree with its group:
+c.Reference.TryCourseWithDepartment(out var course, out var department);
+c.Reference.TryJobTitleInDepartment("Finance", out var title, NameLanguage.Latin);
+```
+
+Only closed lists are built in. Open-ended records such as orders, invoices or products stay
+yours to describe with rules and relations. A bare `Department` property becomes an academic
+department when its class name looks academic (`Course`, `Student`, `University`, ...) and a
+company department otherwise; ambiguous names such as `Category` or `Title` stay unmapped.
 
 ## Related tables without orphans (Part 14)
 

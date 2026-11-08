@@ -60,13 +60,11 @@ var dataset = faker.CreateDataset();
 
 var students = dataset.Table(faker.Define<Student>().AutoFill(autoFill), 8, x => x.Id);
 
-string[] titles = ["Algebra", "Physics", "Databases", "Networks"];
-
 var courses = dataset.Table(
     faker.Define<Course>()
         .AutoFill(autoFill)
-        .RuleFor(x => x.Title, c => titles[(int)(c.ItemIndex % (ulong)titles.Length)]),
-    titles.Length,
+        .RuleFor(x => x.Title, c => c.Reference.TryCourse(out string title, language) ? title : "Course"),
+    5,
     x => x.Id);
 
 dataset.Table(faker.Define<Enrollment>().AutoFill(autoFill), 20, x => x.Id)

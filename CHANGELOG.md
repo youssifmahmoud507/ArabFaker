@@ -18,6 +18,8 @@ versions below `1.0.0` may change the public API.
 - Navigation properties and collections for EF-style classes.
 - Export to JSON, CSV and SQL INSERT (Standard, SQL Server, MySQL dialects).
 - CI workflow, NuGet package metadata and a quick-start sample.
+- Reference data (`c.Reference`): 200 courses grouped under 20 academic departments, 105 job titles under 15 company departments, plus faculties, universities, industries, product categories, payment methods, banks, medical specialties, countries, languages, colors, blood types, currency codes and more, in Arabic and English. Closed lists only; open-ended records such as orders stay user-defined.
+- `AutoFill` recognises `Course`, `Department`, `JobTitle`, `University`, `Faculty`, `Bank`, `Country`, `Currency`, `Specialty` and similar property names.
 - Larger name catalog (123 male, 122 female and 139 family names, each in Arabic and Latin spelling).
 - The quick-start sample writes UTF-8 files (`people.csv`, `people.json`, `dataset.json`, `dataset.sql`) and accepts `--latin`, `--dialect` and `--out`.
 

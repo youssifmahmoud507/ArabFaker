@@ -1,6 +1,7 @@
 ﻿using ArabFaker.NET.Generation.Randomization;
 using ArabFaker.NET.Providers.Arab.Locations;
 using ArabFaker.NET.Providers.Arab.Names;
+using ArabFaker.NET.Providers.Arab.Reference;
 using ArabFaker.NET.Providers.Common.Dates;
 using ArabFaker.NET.Providers.Common.Internet;
 using ArabFaker.NET.Providers.Common.Text;
@@ -23,6 +24,7 @@ namespace ArabFaker.NET.Generation
         internal DatesProvider Dates { get; }
         internal LocationsProvider Locations { get; }
         internal TextProvider Text { get; }
+        internal ReferenceProvider Reference { get; }
 
         internal ulong ItemIndex => _itemIndex;
 
@@ -41,6 +43,7 @@ namespace ArabFaker.NET.Generation
             Dates = new DatesProvider(new RandomGenerator(_streamFactory.Create($"{_scopeKey}/dates", _itemIndex)));
             Locations = new LocationsProvider(new RandomGenerator(_streamFactory.Create($"{_scopeKey}/locations", _itemIndex)));
             Text = new TextProvider(new RandomGenerator(_streamFactory.Create($"{_scopeKey}/text", _itemIndex)));
+            Reference = new ReferenceProvider(new RandomGenerator(_streamFactory.Create($"{_scopeKey}/reference", _itemIndex)));
         }
 
         internal GenerationContext CreateChild(string childScopeKey)

@@ -138,6 +138,7 @@ public NameGenerator Names { get; }
 public InternetGenerator Internet { get; }
 public DatesGenerator Dates { get; }
 public LocationsGenerator Locations { get; }
+public ReferenceGenerator Reference { get; }
 public RandomDataGenerator RandomData { get; }
 public IdentifierGenerator Identifiers { get; }
 public ulong ItemIndex { get; }
@@ -251,6 +252,37 @@ public bool TryFullName(out string name, NameLanguage language = NameLanguage.Ar
 
 ```csharp
 public enum NameLanguage
+```
+
+## ReferenceGenerator  (`ArabFaker.NET.Providers.Arab.Reference`)
+
+```csharp
+public sealed class ReferenceGenerator
+public bool TryFaculty(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryUniversity(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryEducationLevel(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryAcademicYear(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryIndustry(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryProductCategory(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryPaymentMethod(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryBank(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryMedicalSpecialty(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryMaritalStatus(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryCountry(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryLanguage(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryColor(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryDayName(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryMonthName(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryAcademicDepartment(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryCourse(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryCourseWithDepartment(out string course, out string department, NameLanguage language = NameLanguage.Arabic)
+public bool TryCourseInDepartment(string department, out string course, NameLanguage language = NameLanguage.Arabic)
+public bool TryDepartment(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryJobTitle(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryJobTitleWithDepartment(out string jobTitle, out string department, NameLanguage language = NameLanguage.Arabic)
+public bool TryJobTitleInDepartment(string department, out string jobTitle, NameLanguage language = NameLanguage.Arabic)
+public bool TryBloodType(out string value)
+public bool TryCurrencyCode(out string value)
 ```
 
 ## DatesGenerator  (`ArabFaker.NET.Providers.Common.Dates`)
