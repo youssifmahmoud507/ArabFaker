@@ -12,6 +12,8 @@ namespace ArabFaker.NET.Generation
     /// Anything ambiguous or relational is deliberately left unmapped rather than filled with
     /// meaningless data: a bare <c>Name</c>, foreign keys such as <c>CustomerId</c> and strings
     /// with no recognised name. The caller reports those so they can get an explicit rule.
+    /// A bare <c>Department</c> is filled with an academic department when the class name looks
+    /// academic (for example <c>Course</c> or <c>Student</c>), and with a company department otherwise.
     /// </remarks>
     internal static class ConventionCatalog
     {
@@ -31,7 +33,7 @@ namespace ArabFaker.NET.Generation
 
             if (type == typeof(string))
             {
-                factory = StringFactory(key, isPrimaryKey, isKeyColumn, options);
+                factory = StringFactory(property, key, isPrimaryKey, isKeyColumn, options);
             }
             else if (type == typeof(Guid))
             {
@@ -79,6 +81,7 @@ namespace ArabFaker.NET.Generation
         }
 
         private static Func<FakerContext, object?>? StringFactory(
+            PropertyInfo property,
             string key,
             bool isPrimaryKey,
             bool isKeyColumn,
@@ -137,8 +140,111 @@ namespace ArabFaker.NET.Generation
                     return LocationName(LocationLevel.Shiyakha, locationLanguage);
 
                 default:
+                    return ReferenceFactory(property, key, language);
+            }
+        }
+
+        // Words in a class name that make a bare "Department" mean an academic department.
+        private static readonly string[] AcademicTypeHints =
+        [
+            "course", "student", "faculty", "university", "college", "academic",
+            "lecturer", "instructor", "professor", "teacher", "enrollment", "school"
+        ];
+
+        private static Func<FakerContext, object?>? ReferenceFactory(PropertyInfo property, string key, NameLanguage language)
+        {
+            switch (key)
+            {
+                case "course":
+                case "coursename":
+                case "coursetitle":
+                    return context => context.Reference.TryCourse(out string value, language) ? value : string.Empty;
+
+                case "academicdepartment":
+                case "academicdepartmentname":
+                    return context => context.Reference.TryAcademicDepartment(out string value, language) ? value : string.Empty;
+
+                case "department":
+                case "departmentname":
+                    if (IsAcademicType(property.DeclaringType))
+                        return context => context.Reference.TryAcademicDepartment(out string value, language) ? value : string.Empty;
+
+                    return context => context.Reference.TryDepartment(out string value, language) ? value : string.Empty;
+
+                case "jobtitle":
+                case "occupation":
+                    return context => context.Reference.TryJobTitle(out string value, language) ? value : string.Empty;
+
+                case "faculty":
+                case "facultyname":
+                    return context => context.Reference.TryFaculty(out string value, language) ? value : string.Empty;
+
+                case "university":
+                case "universityname":
+                    return context => context.Reference.TryUniversity(out string value, language) ? value : string.Empty;
+
+                case "educationlevel":
+                    return context => context.Reference.TryEducationLevel(out string value, language) ? value : string.Empty;
+
+                case "industry":
+                    return context => context.Reference.TryIndustry(out string value, language) ? value : string.Empty;
+
+                case "productcategory":
+                    return context => context.Reference.TryProductCategory(out string value, language) ? value : string.Empty;
+
+                case "paymentmethod":
+                    return context => context.Reference.TryPaymentMethod(out string value, language) ? value : string.Empty;
+
+                case "bank":
+                case "bankname":
+                    return context => context.Reference.TryBank(out string value, language) ? value : string.Empty;
+
+                case "specialty":
+                case "specialization":
+                case "medicalspecialty":
+                    return context => context.Reference.TryMedicalSpecialty(out string value, language) ? value : string.Empty;
+
+                case "bloodtype":
+                case "bloodgroup":
+                    return context => context.Reference.TryBloodType(out string value) ? value : string.Empty;
+
+                case "maritalstatus":
+                    return context => context.Reference.TryMaritalStatus(out string value, language) ? value : string.Empty;
+
+                case "country":
+                case "countryname":
+                    return context => context.Reference.TryCountry(out string value, language) ? value : string.Empty;
+
+                case "language":
+                    return context => context.Reference.TryLanguage(out string value, language) ? value : string.Empty;
+
+                case "color":
+                case "colour":
+                    return context => context.Reference.TryColor(out string value, language) ? value : string.Empty;
+
+                case "currency":
+                case "currencycode":
+                    return context => context.Reference.TryCurrencyCode(out string value) ? value : string.Empty;
+
+                default:
                     return null;
             }
+        }
+
+        private static bool IsAcademicType(Type? type)
+        {
+            if (type is null)
+                return false;
+
+            string typeName = Normalize(type.Name);
+
+            foreach (string hint in AcademicTypeHints)
+            {
+                if (typeName.Contains(hint, StringComparison.Ordinal))
+                    return true;
+            }
+
+            return false;
         }
 
         private static Func<FakerContext, object?> LocationName(LocationLevel level, LocationLanguage language)

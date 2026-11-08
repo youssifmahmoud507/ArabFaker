@@ -1,5 +1,6 @@
 ﻿using ArabFaker.NET.Providers.Arab.Locations;
 using ArabFaker.NET.Providers.Arab.Names;
+using ArabFaker.NET.Providers.Arab.Reference;
 using ArabFaker.NET.Providers.Common.Dates;
 using ArabFaker.NET.Providers.Common.Identifiers;
 using ArabFaker.NET.Providers.Common.Internet;
@@ -40,6 +41,11 @@ namespace ArabFaker.NET.Generation
         public LocationsGenerator Locations { get; }
 
         /// <summary>
+        /// Gets the generator of values from closed lists such as courses, departments and job titles.
+        /// </summary>
+        public ReferenceGenerator Reference { get; }
+
+        /// <summary>
         /// Gets the random data generator.
         /// </summary>
         public RandomDataGenerator RandomData { get; }
@@ -61,6 +67,7 @@ namespace ArabFaker.NET.Generation
             Internet = new InternetGenerator(context.Internet);
             Dates = new DatesGenerator(context.Dates);
             Locations = new LocationsGenerator(context.Locations);
+            Reference = new ReferenceGenerator(context.Reference);
             RandomData = new RandomDataGenerator(context.Random);
             Identifiers = new IdentifierGenerator(context.Ids);
             ItemIndex = context.ItemIndex;
