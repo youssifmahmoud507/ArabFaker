@@ -204,7 +204,7 @@ namespace ArabFaker.NET.Dataset
                 rows[table] = table.GetRowsAsList();
             }
 
-            return GenerationResult<GeneratedDataset>.Success(new GeneratedDataset(rows));
+            return GenerationResult<GeneratedDataset>.Success(new GeneratedDataset(rows, tables));
         }
 
         internal void AddErrors(IEnumerable<ConfigurationError> errors)

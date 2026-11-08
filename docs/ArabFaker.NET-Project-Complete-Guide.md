@@ -1765,6 +1765,20 @@ IEnumerable<GenerationResult<T>> GenerateLazy(int count);
 - الـ Property يجب أن تكون Writable (نفس قاعدة `RuleFor`). الرسم الناتج دائري (الأب يشير للأبناء والعكس) فالـ Serialization يحتاج إعداد Cycle-aware.
 - **لم يُشغَّل `dotnet build/test`** في بيئة الكتابة؛ المراجعة يدوية.
 
+## 28.7 Part 16 (Export) — خطة وتنفيذ 8 نوفمبر 2026
+
+الملفات (`ArabFaker.NET/Export/`): `RowExporter.cs` (واجهة عامة ثابتة) و`ExportColumn.cs` و`ValueFormatter.cs` و`SqlExportOptions.cs` و`JsonExportOptions.cs` و`SqlDialect.cs`، و`TableOrdering.cs` في `Dataset/`، وطرق `ToSql`/`ToJson` على `GeneratedDataset`. بدون أي مكتبة خارجية (`System.Text.Json` فقط).
+
+- `RowExporter.ToJson/ToCsv/ToSql<T>(rows, options)` تعمل على أي `IEnumerable<T>` (نتيجة `Generate` أو صفوف جدول) وتعيد `GenerationResult<string>`.
+- `GeneratedDataset.ToSql()` يرتب الجداول بحيث تأتي الجداول المشار إليها قبل التي تشير إليها (Kahn بترتيب التسجيل). الجداول المتبادلة الإشارة لا ترتيب صحيح لها فتُكتب بترتيب التسجيل. `ToJson()` يكتب كائنًا واحدًا بجدول لكل Property.
+- الأعمدة: Properties عامة لها Getter وSetter (أو init) من نوع Scalar (نص، أرقام، bool، Guid، تواريخ وأوقات، Enum). الـ Navigation والـ Collections والـ Properties للقراءة فقط تُستبعد، فالرسوم الدائرية لا تسبب مشكلة. الترتيب: الأب أولًا ثم ترتيب التعريف.
+- الصيغ ثابتة بغض النظر عن الـ Culture. JSON يحافظ على العربية مقروءة (`UnsafeRelaxedJsonEscaping`) ويستخدم `\n` فقط. القيم غير المنتهية (NaN/Infinity) تصبح `null`/`NULL`.
+- CSV حسب RFC 4180 (CRLF وتوثيق الاقتباس). لا يوجد حماية من CSV Injection (الصيغ التي تبدأ بـ `=`)، وهي بيانات وهمية للاختبار.
+- SQL: Statement لكل صف. اللهجات: Standard (`"id"`, TRUE/FALSE)، SqlServer (`[id]`, `N'...'`, 1/0)، MySql (`` `id` ``, تضاعف `\`). Enum كنص (افتراضي) أو رقم.
+- الأخطاء (بدون Throw): `NullRows` و`NullRow` و`NoExportableColumns` و`InvalidExportOptions` و`DuplicateTableName` (جدولان بنفس نوع الصف في Dataset واحد).
+- غير مدعوم الآن: أسماء جداول/أعمدة مخصصة، Batch Insert، Identity Insert، CREATE TABLE، EF Core Seeding (أجزاء لاحقة).
+- **لم يُشغَّل `dotnet build/test`** في بيئة الكتابة؛ المراجعة يدوية.
+
 # 29. قرارات مؤجلة ومخاطر يجب مراجعتها
 
 هذه النقاط لا تعني أن المشروع فاشل؛ لكنها أمور مهمة قبل نشر مكتبة عامة.

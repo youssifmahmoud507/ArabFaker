@@ -13,6 +13,8 @@ namespace ArabFaker.NET.Dataset
 
         string RowTypeName { get; }
 
+        Type RowType { get; }
+
         IReadOnlyList<ForeignKeyPlan> GetForeignKeys();
 
         IReadOnlyList<UniqueGroup> GetUniqueGroups();

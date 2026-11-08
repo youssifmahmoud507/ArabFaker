@@ -72,6 +72,8 @@ namespace ArabFaker.NET.Dataset
 
         string ITableRuntime.RowTypeName => typeof(T).Name;
 
+        Type ITableRuntime.RowType => typeof(T);
+
         /// <summary>
         /// Makes a property of this table reference a row of another table.
         /// </summary>
