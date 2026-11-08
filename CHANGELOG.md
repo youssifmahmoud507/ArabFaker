@@ -18,9 +18,12 @@ versions below `1.0.0` may change the public API.
 - Navigation properties and collections for EF-style classes.
 - Export to JSON, CSV and SQL INSERT (Standard, SQL Server, MySQL dialects).
 - CI workflow, NuGet package metadata and a quick-start sample.
+- Larger name catalog (123 male, 122 female and 139 family names, each in Arabic and Latin spelling).
+- The quick-start sample writes UTF-8 files (`people.csv`, `people.json`, `dataset.json`, `dataset.sql`) and accepts `--latin`, `--dialect` and `--out`.
 
 ### Notes
 
+- Changing the name catalog changes the names produced for a given seed.
 - Nothing has been published to NuGet. Check that the package ID `ArabFaker.NET` is available
   before publishing.
 - The embedded Egypt administrative divisions data is licensed separately (CC BY 4.0); see
