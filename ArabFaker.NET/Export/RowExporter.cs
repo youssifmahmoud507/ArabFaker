@@ -17,7 +17,7 @@ namespace ArabFaker.NET.Export
     /// </para>
     /// <para>
     /// Output never depends on the machine culture. Problems are returned as errors, never thrown.
-    /// The column set comes from <typeparamref name="T"/>, not from the runtime type of each row.
+    /// The column set comes from the row type argument <c>T</c> of each method, not from the runtime type of each row.
     /// </para>
     /// </remarks>
     public static class RowExporter
