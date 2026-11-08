@@ -147,6 +147,13 @@ the machine culture, Arabic text stays readable in JSON, and SQL Server output u
 Tables that reference each other cannot be ordered and are written in registration order.
 Problems are returned as errors (`result.Errors`), never thrown.
 
+## More documentation
+
+- `docs/ArabFaker.NET-Project-Complete-Guide.md` — design, decisions and per-part implementation notes (Arabic).
+- `docs/PublicAPI.md` — the public API surface.
+- `docs/RELEASE-CHECKLIST.md` — what to verify before publishing.
+- `CHANGELOG.md` and `THIRD-PARTY-NOTICES.md`.
+
 ## Not for security use
 
 The generators use a seeded, non-cryptographic PRNG (Xoshiro256**). Do **not** use them

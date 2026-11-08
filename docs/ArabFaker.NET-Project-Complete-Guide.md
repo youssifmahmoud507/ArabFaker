@@ -1790,6 +1790,19 @@ IEnumerable<GenerationResult<T>> GenerateLazy(int count);
 - **مؤجل:** Benchmarks (تحتاج BenchmarkDotNet)، SourceLink، التحقق من توفر Package ID `ArabFaker.NET` على nuget.org، مراجعة Public API النهائية، النشر.
 - **لم يُشغَّل `dotnet build/test/pack`** في بيئة الكتابة؛ أول تشغيل فعلي سيكون من CI أو من جهازك.
 
+## 28.9 Part 18 (المراجعة النهائية) — 8 نوفمبر 2026
+
+فحص نصي ثابت للمشروع (بدون Build). النتائج:
+
+- **`throw`:** لا يوجد في كود المكتبة. **`catch`:** موضعان فقط في `LocationCatalog` (`JsonException` و`IOException`) وكلاهما نوع محدد ويُرجعان فشل التحميل، لا يوجد catch عام.
+- **TODO/FIXME/HACK:** لا يوجد.
+- **XML docs:** كل الأنواع والأعضاء العامة موثقة. الأعضاء العامة غير الموثقة التي ظهرت في الفحص كلها داخل أنواع `internal` (مثل `RandomGenerator`)، وهي خارج الـ API.
+- **Public API:** تم توليد `docs/PublicAPI.md` للمراجعة والمقارنة قبل كل إصدار.
+- **ملاحظة API:** `DatasetTable<T, TKey>` يطبق واجهة `internal` (`ITableRuntime`) وهذا مسموح ولا يظهر للمستخدم إلا عبر Reflection؛ يمكن إخفاؤه لاحقًا بتحويل الأعضاء لـ Explicit فقط (هي كذلك بالفعل).
+- أُضيف `docs/RELEASE-CHECKLIST.md`: خطوات التحقق والـ Pack والتثبيت التجريبي والنشر، وكل بند منها يحتاج تشغيلًا فعليًا على جهازك.
+
+**بنود §30 التي لا تُحسم إلا بتشغيل فعلي:** Build نظيف، Tests كاملة، Nullable warnings، تجربة تثبيت الحزمة، التحقق من توفر `PackageId`، النشر.
+
 # 29. قرارات مؤجلة ومخاطر يجب مراجعتها
 
 هذه النقاط لا تعني أن المشروع فاشل؛ لكنها أمور مهمة قبل نشر مكتبة عامة.
