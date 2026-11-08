@@ -6,7 +6,7 @@ ArabFaker only gives you reproducible building blocks to fill them.
 
 > **Status: under development (pre-release).** Parts 1–10 of the plan are implemented
 > (randomization engine, seeds/streams, providers, `Faker` + `FakerContext`).
-> `Define<T>() / RuleFor()` (Part 11) `Generate()` / `Generate(count)` / `GenerateLazy()` (Part 12) `AutoFill()` (Part 13) and datasets with relations (Part 14) are implemented.
+> `Define<T>() / RuleFor()` (Part 11) `Generate()` / `Generate(count)` / `GenerateLazy()` (Part 12) `AutoFill()` (Part 13) datasets with relations (Part 14) and navigation properties (Part 15) are implemented.
 > No NuGet package has been published.
 
 ## Highlights
@@ -98,7 +98,18 @@ Every foreign key points to a row that exists in the same dataset. Tables can be
 order and may even reference each other. Foreign keys can be optional (`nullChance`, on a
 nullable property), and a mistake in the setup (wrong type, duplicate relation, too many rows for a
 unique group, an empty parent table, duplicate keys) is reported as an error before or instead of
-producing data. A single class with no relations needs none of this: use `Define<T>().Generate()`.
+producing data. 
+For EF-style classes, fill navigation properties too (register the foreign key first):
+
+```csharp
+enrollments.Navigation(x => x.StudentId, x => x.Student);                // enrollment.Student
+students.Collection(x => x.Enrollments, enrollments, e => e.StudentId);  // student.Enrollments
+employees.Collection(x => x.Reports, employees, x => x.ManagerId);       // hierarchy
+```
+
+Navigation objects point to the very same instances that are in the dataset, and every parent gets a
+list (empty if nothing references it). Both directions refer to each other, so serialise with a
+cycle-aware setting. A single class with no relations needs none of this: use `Define<T>().Generate()`.
 
 ## Not for security use
 

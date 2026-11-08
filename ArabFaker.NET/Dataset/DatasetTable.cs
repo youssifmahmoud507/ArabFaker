@@ -31,9 +31,15 @@ namespace ArabFaker.NET.Dataset
 
         private readonly List<UniqueGroup> _uniqueGroups = [];
 
+        private readonly List<NavigationPlan> _navigations = [];
+
+        private readonly List<CollectionPlan> _collections = [];
+
         private T[] _rows = [];
 
         private object[] _keys = [];
+
+        private Dictionary<object, int> _rowIndexByKey = new();
 
         internal DatasetTable(
             DatasetBuilder builder,
@@ -150,7 +156,9 @@ namespace ArabFaker.NET.Dataset
                 isSelfReference: false,
                 roots: 0,
                 nullChance,
-                CompileSetter(property)));
+                typeof(TParent),
+                CompileSetter(property),
+                CompileGetter(property)));
 
             return this;
         }
@@ -212,7 +220,9 @@ namespace ArabFaker.NET.Dataset
                 isSelfReference: true,
                 roots,
                 nullChance: 0,
-                CompileSetter(property)));
+                typeof(T),
+                CompileSetter(property),
+                CompileGetter(property)));
 
             return this;
         }
@@ -250,6 +260,199 @@ namespace ArabFaker.NET.Dataset
                 TryGetName(third, out string? c) ? c : null);
         }
 
+        /// <summary>
+        /// Fills a navigation property on this table's rows with the parent row object that its
+        /// foreign key points to (for example <c>enrollment.Student</c>).
+        /// </summary>
+        /// <remarks>
+        /// The foreign key must already be registered with <c>ForeignKey</c> or <c>SelfReference</c>.
+        /// The property type must accept the parent row type. A null foreign key gives a null navigation.
+        /// Navigations never change which parent a row references.
+        /// </remarks>
+        /// <typeparam name="TForeignKey">The foreign key property type.</typeparam>
+        /// <typeparam name="TNavigation">The navigation property type (the parent row type or a base type).</typeparam>
+        /// <param name="foreignKey">The foreign key property, such as <c>x =&gt; x.StudentId</c>.</param>
+        /// <param name="navigation">The writable navigation property, such as <c>x =&gt; x.Student</c>.</param>
+        /// <returns>This table.</returns>
+        public DatasetTable<T, TKey> Navigation<TForeignKey, TNavigation>(
+            Expression<Func<T, TForeignKey>> foreignKey,
+            Expression<Func<T, TNavigation>> navigation)
+        {
+            if (!IsRegistered)
+                return this;
+
+            var errors = new List<ConfigurationError>();
+
+            bool hasForeignKey = TryAnalyze(foreignKey, out PropertyInfo? fkProperty, errors);
+            bool hasNavigation = TryAnalyze(navigation, out PropertyInfo? navProperty, errors);
+
+            if (!hasForeignKey || !hasNavigation)
+            {
+                _builder.AddErrors(errors);
+
+                return this;
+            }
+
+            lock (_builder.SyncRoot)
+            {
+                ForeignKeyPlan? plan = _foreignKeys.FirstOrDefault(candidate => candidate.PropertyName == fkProperty!.Name);
+
+                if (plan is null)
+                {
+                    errors.Add(new ConfigurationError(
+                        ConfigurationErrorCodes.NavigationForeignKeyMissing,
+                        $"'{fkProperty!.Name}' has no relation yet. Register ForeignKey or SelfReference before Navigation."));
+                }
+                else if (!typeof(TNavigation).IsAssignableFrom(plan.ParentRowType))
+                {
+                    errors.Add(new ConfigurationError(
+                        ConfigurationErrorCodes.NavigationTypeMismatch,
+                        $"'{navProperty!.Name}' has type '{typeof(TNavigation)}' but the related rows are '{plan.ParentRowType}'."));
+                }
+                else if (_navigations.Any(candidate => candidate.ForeignKey == plan))
+                {
+                    errors.Add(new ConfigurationError(
+                        ConfigurationErrorCodes.NavigationPropertyConflict,
+                        $"'{fkProperty!.Name}' already has a navigation."));
+                }
+
+                if (IsPropertyNameTaken(navProperty!.Name))
+                {
+                    errors.Add(new ConfigurationError(
+                        ConfigurationErrorCodes.NavigationPropertyConflict,
+                        $"'{navProperty!.Name}' is already used as a key, relation, navigation or collection."));
+                }
+
+                if (errors.Count == 0 && plan is not null)
+                {
+                    _navigations.Add(new NavigationPlan(plan, navProperty!.Name, CompileSetter(navProperty)));
+
+                    return this;
+                }
+            }
+
+            _builder.AddErrors(errors);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Fills a collection property on this table's rows with the child rows that reference
+        /// them (for example <c>student.Enrollments</c>).
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The child's foreign key must already be registered and must point to this table. Every row
+        /// gets a list, empty when nothing references it. The property type must be assignable from
+        /// <see cref="List{T}"/> (for example <c>List&lt;T&gt;</c>, <c>ICollection&lt;T&gt;</c>,
+        /// <c>IList&lt;T&gt;</c>, <c>IEnumerable&lt;T&gt;</c>, <c>IReadOnlyList&lt;T&gt;</c>).
+        /// </para>
+        /// <para>
+        /// For a hierarchy use the same table as <paramref name="child"/>, for example
+        /// <c>employees.Collection(x =&gt; x.Reports, employees, x =&gt; x.ManagerId)</c>.
+        /// </para>
+        /// </remarks>
+        /// <param name="collectionSelector">The writable collection property, such as <c>x =&gt; x.Enrollments</c>.</param>
+        /// <param name="child">The table whose rows go into the collection, from the same dataset.</param>
+        /// <param name="childForeignKey">The child's foreign key that points to this table.</param>
+        /// <returns>This table.</returns>
+        public DatasetTable<T, TKey> Collection<TCollection, TChild, TChildKey, TForeignKey>(
+            Expression<Func<T, TCollection>> collectionSelector,
+            DatasetTable<TChild, TChildKey> child,
+            Expression<Func<TChild, TForeignKey>> childForeignKey)
+            where TChild : class
+            where TChildKey : notnull
+        {
+            if (!IsRegistered)
+                return this;
+
+            var errors = new List<ConfigurationError>();
+
+            if (child is null)
+            {
+                _builder.AddErrors([new ConfigurationError(
+                    ConfigurationErrorCodes.NavigationTargetInvalid,
+                    "The child table cannot be null.")]);
+
+                return this;
+            }
+
+            if (!child.IsRegistered)
+                return this; // The reason was already reported when that table was added.
+
+            if (!PropertySelectorAnalyzer.TryAnalyze(collectionSelector, out PropertyInfo? collectionProperty, out ConfigurationError? collectionError))
+                errors.Add(collectionError);
+
+            if (!PropertySelectorAnalyzer.TryAnalyze(childForeignKey, out PropertyInfo? childFkProperty, out ConfigurationError? fkError))
+                errors.Add(fkError);
+
+            if (collectionProperty is null || childFkProperty is null)
+            {
+                _builder.AddErrors(errors);
+
+                return this;
+            }
+
+            if (!ReferenceEquals(child.Builder, _builder))
+            {
+                errors.Add(new ConfigurationError(
+                    ConfigurationErrorCodes.NavigationTargetInvalid,
+                    "The child table belongs to a different dataset."));
+            }
+
+            if (!typeof(TCollection).IsAssignableFrom(typeof(List<TChild>)))
+            {
+                errors.Add(new ConfigurationError(
+                    ConfigurationErrorCodes.NavigationTypeMismatch,
+                    $"'{collectionProperty.Name}' has type '{typeof(TCollection)}', which cannot hold a List<{typeof(TChild).Name}>. "
+                    + "Use List<T>, ICollection<T>, IList<T>, IEnumerable<T> or IReadOnlyList<T>."));
+            }
+
+            ForeignKeyPlan? childPlan = ((ITableRuntime)child)
+                .GetForeignKeys()
+                .FirstOrDefault(candidate => candidate.PropertyName == childFkProperty.Name);
+
+            if (childPlan is null)
+            {
+                errors.Add(new ConfigurationError(
+                    ConfigurationErrorCodes.NavigationForeignKeyMissing,
+                    $"'{childFkProperty.Name}' of '{typeof(TChild).Name}' has no relation yet."));
+            }
+            else if (!ReferenceEquals(childPlan.Parent, this))
+            {
+                errors.Add(new ConfigurationError(
+                    ConfigurationErrorCodes.NavigationTargetInvalid,
+                    $"'{typeof(TChild).Name}.{childFkProperty.Name}' does not reference '{typeof(T).Name}'."));
+            }
+
+            lock (_builder.SyncRoot)
+            {
+                if (IsPropertyNameTaken(collectionProperty.Name))
+                {
+                    errors.Add(new ConfigurationError(
+                        ConfigurationErrorCodes.NavigationPropertyConflict,
+                        $"'{collectionProperty.Name}' is already used as a key, relation, navigation or collection."));
+                }
+
+                if (errors.Count == 0 && childPlan is not null)
+                {
+                    _collections.Add(new CollectionPlan(
+                        child,
+                        childPlan,
+                        collectionProperty.Name,
+                        static () => new List<TChild>(),
+                        static (list, row) => ((List<TChild>)list).Add((TChild)row),
+                        CompileSetter(collectionProperty)));
+
+                    return this;
+                }
+            }
+
+            _builder.AddErrors(errors);
+
+            return this;
+        }
+
         // ---------- ITableRuntime ----------
 
         int ITableRuntime.RowCount => RowCount;
@@ -270,6 +473,36 @@ namespace ArabFaker.NET.Dataset
             }
         }
 
+        IReadOnlyList<NavigationPlan> ITableRuntime.GetNavigations()
+        {
+            lock (_builder.SyncRoot)
+            {
+                return _navigations.ToArray();
+            }
+        }
+
+        IReadOnlyList<CollectionPlan> ITableRuntime.GetCollections()
+        {
+            lock (_builder.SyncRoot)
+            {
+                return _collections.ToArray();
+            }
+        }
+
+        bool ITableRuntime.TryGetRowByKey(object key, out object row)
+        {
+            if (_rowIndexByKey.TryGetValue(key, out int index))
+            {
+                row = _rows[index];
+
+                return true;
+            }
+
+            row = null!;
+
+            return false;
+        }
+
         bool ITableRuntime.TryGenerate(out List<GenerationError> errors)
         {
             errors = [];
@@ -285,7 +518,7 @@ namespace ArabFaker.NET.Dataset
 
             T[] rows = result.Value.ToArray();
             object[] keys = new object[rows.Length];
-            var seen = new HashSet<object>();
+            var indexByKey = new Dictionary<object, int>();
 
             for (int i = 0; i < rows.Length; i++)
             {
@@ -300,7 +533,7 @@ namespace ArabFaker.NET.Dataset
                     return false;
                 }
 
-                if (!seen.Add(key))
+                if (!indexByKey.TryAdd(key, i))
                 {
                     errors.Add(new GenerationError(
                         GenerationErrorCodes.DuplicateKey,
@@ -315,6 +548,7 @@ namespace ArabFaker.NET.Dataset
 
             _rows = rows;
             _keys = keys;
+            _rowIndexByKey = indexByKey;
 
             return true;
         }
@@ -452,6 +686,25 @@ namespace ArabFaker.NET.Dataset
             }
 
             return this;
+        }
+
+        private bool IsPropertyNameTaken(string name)
+        {
+            return (_keyProperty is not null && _keyProperty.Name == name)
+                || _foreignKeys.Any(plan => plan.PropertyName == name)
+                || _navigations.Any(plan => plan.PropertyName == name)
+                || _collections.Any(plan => plan.PropertyName == name);
+        }
+
+        private static Func<object, object?> CompileGetter(PropertyInfo property)
+        {
+            ParameterExpression row = Expression.Parameter(typeof(object), "row");
+
+            UnaryExpression value = Expression.Convert(
+                Expression.Property(Expression.Convert(row, typeof(T)), property),
+                typeof(object));
+
+            return Expression.Lambda<Func<object, object?>>(value, row).Compile();
         }
 
         private static Action<object, object?> CompileSetter(PropertyInfo property)

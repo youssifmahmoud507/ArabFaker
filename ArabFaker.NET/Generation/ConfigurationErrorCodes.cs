@@ -74,6 +74,18 @@ namespace ArabFaker.NET.Generation
         /// <summary>The unique group is not made of distinct, registered, non-null foreign keys.</summary>
         public const string InvalidUniqueGroup = "Faker.InvalidUniqueGroup";
 
+        /// <summary>A navigation was declared for a foreign key that is not registered on the table.</summary>
+        public const string NavigationForeignKeyMissing = "Faker.NavigationForeignKeyMissing";
+
+        /// <summary>The navigation or collection property type cannot hold the related rows.</summary>
+        public const string NavigationTypeMismatch = "Faker.NavigationTypeMismatch";
+
+        /// <summary>The property is already used as a key, foreign key, navigation or collection.</summary>
+        public const string NavigationPropertyConflict = "Faker.NavigationPropertyConflict";
+
+        /// <summary>The related table or foreign key does not match this table or dataset.</summary>
+        public const string NavigationTargetInvalid = "Faker.NavigationTargetInvalid";
+
         /// <summary>No more definition scopes can be allocated.</summary>
         public const string DefinitionIdExhausted = "Faker.DefinitionIdExhausted";
     }

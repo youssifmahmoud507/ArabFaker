@@ -192,6 +192,11 @@ namespace ArabFaker.NET.Dataset
             if (failures.Count > 0)
                 return GenerationResult<GeneratedDataset>.Failure(failures);
 
+            foreach (ITableRuntime table in tables)
+            {
+                LinkNavigations(table);
+            }
+
             var rows = new Dictionary<object, object>(ReferenceEqualityComparer.Instance);
 
             foreach (ITableRuntime table in tables)
@@ -280,6 +285,59 @@ namespace ArabFaker.NET.Dataset
             foreach (UniqueGroup group in groups)
             {
                 AssignUniqueGroup(table, group, failures);
+            }
+        }
+
+        // Runs after every relation is filled. It never changes a foreign key or uses randomness.
+        private static void LinkNavigations(ITableRuntime table)
+        {
+            foreach (NavigationPlan navigation in table.GetNavigations())
+            {
+                for (int row = 0; row < table.RowCount; row++)
+                {
+                    object rowObject = table.GetRowAt(row);
+
+                    object? foreignKey = navigation.ForeignKey.Getter(rowObject);
+
+                    object? parent = null;
+
+                    if (foreignKey is not null && navigation.ForeignKey.Parent.TryGetRowByKey(foreignKey, out object found))
+                        parent = found;
+
+                    navigation.Setter(rowObject, parent);
+                }
+            }
+
+            foreach (CollectionPlan collection in table.GetCollections())
+            {
+                var lists = new Dictionary<object, object>();
+
+                for (int index = 0; index < collection.Child.RowCount; index++)
+                {
+                    object childRow = collection.Child.GetRowAt(index);
+
+                    object? foreignKey = collection.ChildForeignKey.Getter(childRow);
+
+                    if (foreignKey is null)
+                        continue;
+
+                    if (!lists.TryGetValue(foreignKey, out object? list))
+                    {
+                        list = collection.CreateList();
+                        lists[foreignKey] = list;
+                    }
+
+                    collection.AddToList(list, childRow);
+                }
+
+                for (int row = 0; row < table.RowCount; row++)
+                {
+                    object list = lists.TryGetValue(table.GetKeyAt(row), out object? existing)
+                        ? existing
+                        : collection.CreateList();
+
+                    collection.Setter(table.GetRowAt(row), list);
+                }
             }
         }
 
