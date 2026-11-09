@@ -18,7 +18,16 @@ dotnet add reference path/to/ArabFaker.NET/ArabFaker.NET.csproj
 
 `samples/ArabFaker.DatabaseDemo` loads generated data into a real SQLite database with PRIMARY KEY,
 FOREIGN KEY, UNIQUE and CHECK constraints and verifies it with queries
-(`dotnet run --project samples/ArabFaker.DatabaseDemo`).
+(`dotnet run --project samples/ArabFaker.DatabaseDemo`). The same check against a real SQL Server
+(Windows authentication, Arabic `N'..'` text, constraints verified by SQL Server) is in
+`samples/ArabFaker.SqlServerDemo`:
+
+```powershell
+dotnet run --project samples/ArabFaker.SqlServerDemo -- --server .\SQLEXPRESS
+```
+
+It drops and recreates a database named `ArabFakerDemo` (the name must start with `ArabFaker`),
+and writes `arabfaker-sqlserver-demo.sql` so you can open the same data in SSMS.
 
 A runnable example lives in `samples/ArabFaker.QuickStart` (`dotnet run --project samples/ArabFaker.QuickStart -- --latin`). It writes UTF-8 files to `quickstart-output/`; add `--latin` for English-letter names.
 

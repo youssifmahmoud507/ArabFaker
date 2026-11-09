@@ -22,6 +22,7 @@ versions below `1.0.0` may change the public API.
 - `c.Identifiers.GenerateNationalId()`: 14 random digits (no structure, test data only). `AutoFill` fills `NationalId` with it. No phone number generator is provided on purpose.
 - `RuleFor(x => x.P, (x, c) => ...)`: a dependent rule that runs after all other rules and can read the other properties of the same object, so a job title or course can match the department written on the same row.
 - `samples/ArabFaker.DatabaseDemo`: loads generated data into a real SQLite database with PRIMARY KEY, FOREIGN KEY, UNIQUE and CHECK constraints and verifies it with queries. CI runs it.
+- `samples/ArabFaker.SqlServerDemo`: the same real-database check against SQL Server (Windows authentication by default, `--server`/`--connection` to change). It drops and recreates a database whose name starts with `ArabFaker`, loads the SQL Server dialect script (`N'..'` Arabic text) and checks constraints with SQL Server itself. Not run in CI because it needs a SQL Server instance.
 - `AutoFill` recognises `Course`, `Department`, `JobTitle`, `University`, `Faculty`, `Bank`, `Country`, `Currency`, `Specialty` and similar property names.
 - Larger name catalog (123 male, 122 female and 139 family names, each in Arabic and Latin spelling).
 - The quick-start sample writes UTF-8 files (`people.csv`, `people.json`, `dataset.json`, `dataset.sql`) and accepts `--latin`, `--dialect` and `--out`.

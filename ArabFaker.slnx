@@ -3,4 +3,5 @@
   <Project Path="ArabFaker.Tests/ArabFaker.Tests.csproj" />
   <Project Path="samples/ArabFaker.DatabaseDemo/ArabFaker.DatabaseDemo.csproj" />
   <Project Path="samples/ArabFaker.QuickStart/ArabFaker.QuickStart.csproj" />
+  <Project Path="samples/ArabFaker.SqlServerDemo/ArabFaker.SqlServerDemo.csproj" />
 </Solution>
