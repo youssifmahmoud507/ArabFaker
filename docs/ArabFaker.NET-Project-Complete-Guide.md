@@ -1821,6 +1821,14 @@ IEnumerable<GenerationResult<T>> GenerateLazy(int count);
 - **Dependent Rule:** overload جديد `RuleFor(x => x.P, (x, c) => ...)` يرى الكائن نفسه ويعمل بعد كل القواعد العادية (صريحة أو AutoFill)، وبترتيب التسجيل بين القواعد التابعة. يحل مشكلة اتساق قيمتين في نفس الصف (كورس مع قسمه). تغيّر توقيعان في الاختبارات: تمرير `null!` صار يحتاج cast لأن الـ overload صار ثنائيًا.
 - **اختبار حقيقي:** `samples/ArabFaker.DatabaseDemo` ينشئ قاعدة SQLite حقيقية فيها PRIMARY KEY وFOREIGN KEY وUNIQUE وCHECK، يحمّل سكربت INSERT المولّد، ثم يسأل القاعدة نفسها (فحص المفاتيح الأجنبية، تكرار الأزواج، طول الرقم القومي، سلامة العربية بعد الذهاب والعودة، ثبات الناتج لنفس الـ seed). يعمل في CI بالعربية وبالحروف اللاتينية. SQLite ليست SQL Server: سلوك `N'..'` والتواريخ يحتاج تجربة منفصلة على SQL Server قبل الإصدار.
 
+## 28.12 Part 22 (اختبار SQL Server الحقيقي) — 9 نوفمبر 2026
+
+- المالك يعمل على SQL Server وليس عنده SQLite، فأُضيف `samples/ArabFaker.SqlServerDemo` (Microsoft.Data.SqlClient): نفس سيناريو الشركة والجامعة، لكن بـ SQL Server dialect (`N'..'` و`[..]`) وجداول بأنواع حقيقية (NVARCHAR وDATE وDECIMAL وCHAR(14)) وقيود PK/FK/UNIQUE/CHECK.
+- الأمان: يحذف ويعيد إنشاء قاعدة اسمها يبدأ بـ `ArabFaker` فقط (الاسم الافتراضي `ArabFakerDemo`) ويرفض أي اسم آخر، ويقبل `--server` أو `--connection`.
+- الفحوص تُنفَّذ بواسطة SQL Server نفسه: `sys.foreign_keys` (مفعّلة وموثوقة)، `DBCC CHECKCONSTRAINTS`، عدم تكرار (طالب، كورس)، طول الرقم القومي، رجوع العربية كما دخلت، ثبات الناتج لنفس الـ seed.
+- يكتب `arabfaker-sqlserver-demo.sql` بترميز UTF-8 مع BOM ليفتحه SSMS بالعربية صحيحة.
+- لا يعمل في CI لأنه يحتاج نسخة SQL Server؛ يبقى تشغيلًا يدويًا قبل الإصدار (يُضاف إلى RELEASE-CHECKLIST).
+
 # 29. قرارات مؤجلة ومخاطر يجب مراجعتها
 
 هذه النقاط لا تعني أن المشروع فاشل؛ لكنها أمور مهمة قبل نشر مكتبة عامة.

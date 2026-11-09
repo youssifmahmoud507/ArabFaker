@@ -41,6 +41,13 @@ dotnet add package ArabFaker.NET --version 0.1.0-preview.1 --source ../../artifa
 - [ ] `README.md` و`CHANGELOG.md` محدثان، ورقم الإصدار في `ArabFaker.NET.csproj` يطابق `CHANGELOG.md`.
 - [ ] كل Public type موثق بـ XML (تم فحصه نصيًا: لا نقص في الأنواع العامة؛ الأنواع الداخلية خارج الفحص).
 
+## 4.5 اختبار قاعدة بيانات حقيقية
+
+- [ ] `dotnet run --project samples/ArabFaker.SqlServerDemo -- --server <your-server>`: كل الفحوص PASS بالعربية.
+- [ ] نفس الأمر مع `--latin --seed 7`: كل الفحوص PASS.
+- [ ] افتح `arabfaker-sqlserver-demo.sql` في SSMS وتأكد أن العربية تظهر صحيحة.
+- [ ] `dotnet run --project samples/ArabFaker.DatabaseDemo` (SQLite، يعمل في CI أيضًا): كل الفحوص PASS.
+
 ## 5. النشر (بعد موافقتك فقط)
 
 1. أنشئ Tag: `git tag v0.1.0-preview.1 && git push origin v0.1.0-preview.1`.

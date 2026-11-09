@@ -364,3 +364,4 @@ FodyWeavers.xsd
 # QuickStart sample output
 quickstart-output/
 arabfaker-demo.*
+arabfaker-sqlserver-demo.sql
