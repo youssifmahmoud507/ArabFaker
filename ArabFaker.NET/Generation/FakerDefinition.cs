@@ -156,6 +156,44 @@ namespace ArabFaker.NET.Generation
             Expression<Func<T, TProperty>> propertySelector,
             Func<FakerContext, TProperty> valueFactory)
         {
+            if (valueFactory is null)
+                return AddRule<TProperty>(propertySelector, null, dependent: false);
+
+            return AddRule<TProperty>(propertySelector, (_, context) => valueFactory(context), dependent: false);
+        }
+
+        /// <summary>
+        /// Registers how to produce the value of one property from the other properties of the same object.
+        /// </summary>
+        /// <remarks>
+        /// A rule registered this way runs after every other kind of rule (explicit or <c>AutoFill</c>),
+        /// so the object it receives already has all of its ordinary properties set. Dependent rules run in
+        /// the order they were registered, so one can read the result of an earlier one.
+        /// Use it when two values must agree, for example a job title that belongs to the department
+        /// already written on the same object.
+        /// </remarks>
+        /// <typeparam name="TProperty">The property type.</typeparam>
+        /// <param name="propertySelector">
+        /// A direct property selector such as <c>x =&gt; x.JobTitle</c>. The property must be a public,
+        /// writable instance property (not init-only, nested, static, indexer or field).
+        /// </param>
+        /// <param name="valueFactory">
+        /// Produces the value from the object being built and the generation context. It is not invoked
+        /// when the rule is registered, only when an object is generated.
+        /// </param>
+        /// <returns>This definition, to allow fluent chaining.</returns>
+        public FakerDefinition<T> RuleFor<TProperty>(
+            Expression<Func<T, TProperty>> propertySelector,
+            Func<T, FakerContext, TProperty> valueFactory)
+        {
+            return AddRule(propertySelector, valueFactory, dependent: true);
+        }
+
+        private FakerDefinition<T> AddRule<TProperty>(
+            Expression<Func<T, TProperty>> propertySelector,
+            Func<T, FakerContext, TProperty>? valueFactory,
+            bool dependent)
+        {
             var errors = new List<ConfigurationError>();
 
             if (valueFactory is null)
@@ -181,9 +219,9 @@ namespace ArabFaker.NET.Generation
 
             Action<T, TProperty> setter = CompileSetter<TProperty>(property);
 
-            Action<T, FakerContext> apply = (instance, context) => setter(instance, valueFactory!(context));
+            Action<T, FakerContext> apply = (instance, context) => setter(instance, valueFactory!(instance, context));
 
-            var rule = new PropertyRule(property.Name, apply);
+            var rule = new PropertyRule(property.Name, apply, dependent);
 
             lock (_syncRoot)
             {
@@ -302,7 +340,7 @@ namespace ArabFaker.NET.Generation
                     }
 
                     _ruleIndexes[property.Name] = _rules.Count;
-                    _rules.Add(new PropertyRule(property.Name, apply));
+                    _rules.Add(new PropertyRule(property.Name, apply, dependent: false));
                 }
 
                 _unmappedProperties = unmapped.ToArray();
@@ -320,7 +358,7 @@ namespace ArabFaker.NET.Generation
         {
             lock (_syncRoot)
             {
-                _frozenRules ??= _rules.ToArray();
+                _frozenRules ??= OrderedRules();
             }
 
             return this;
@@ -548,8 +586,14 @@ namespace ArabFaker.NET.Generation
 
             lock (_syncRoot)
             {
-                return _frozenRules ?? _rules.ToArray();
+                return _frozenRules ?? OrderedRules();
             }
+        }
+
+        // Ordinary rules first, then dependent rules; each group keeps its registration order.
+        private PropertyRule[] OrderedRules()
+        {
+            return _rules.Where(rule => !rule.Dependent).Concat(_rules.Where(rule => rule.Dependent)).ToArray();
         }
 
         private void AddErrors(List<ConfigurationError> errors)
@@ -586,11 +630,14 @@ namespace ArabFaker.NET.Generation
 
         private sealed class PropertyRule
         {
-            internal PropertyRule(string propertyName, Action<T, FakerContext> apply)
+            internal PropertyRule(string propertyName, Action<T, FakerContext> apply, bool dependent)
             {
                 PropertyName = propertyName;
                 Apply = apply;
+                Dependent = dependent;
             }
+
+            internal bool Dependent { get; }
 
             internal string PropertyName { get; }
 

@@ -87,5 +87,51 @@ namespace ArabFaker.Tests.Providers.Common.Identifiers
 
             Assert.NotEqual(first, second);
         }
+
+        [Fact]
+        public void GenerateNationalId_ShouldReturnFourteenDigits()
+        {
+            var context = CreateContext();
+
+            for (int i = 0; i < 500; i++)
+            {
+                string id = context.Identifiers.GenerateNationalId();
+
+                Assert.Equal(14, id.Length);
+                Assert.All(id, c => Assert.InRange(c, '0', '9'));
+            }
+        }
+
+        [Fact]
+        public void GenerateNationalId_ShouldUseEveryDigitAndAnyLeadingDigit()
+        {
+            var context = CreateContext();
+            var digits = new HashSet<char>();
+            var leading = new HashSet<char>();
+
+            for (int i = 0; i < 2000; i++)
+            {
+                string id = context.Identifiers.GenerateNationalId();
+
+                foreach (char c in id)
+                    digits.Add(c);
+
+                leading.Add(id[0]);
+            }
+
+            Assert.Equal(10, digits.Count);
+            Assert.Equal(10, leading.Count);
+        }
+
+        [Fact]
+        public void GenerateNationalId_ShouldBeDeterministicForTheSameSeed()
+        {
+            string first = CreateContext(7).Identifiers.GenerateNationalId();
+            string second = CreateContext(7).Identifiers.GenerateNationalId();
+            string other = CreateContext(8).Identifiers.GenerateNationalId();
+
+            Assert.Equal(first, second);
+            Assert.NotEqual(first, other);
+        }
     }
 }

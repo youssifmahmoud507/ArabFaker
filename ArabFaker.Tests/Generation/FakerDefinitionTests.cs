@@ -265,7 +265,7 @@ namespace ArabFaker.Tests.Generation
         public void RuleFor_NullValueFactory_ShouldReportError()
         {
             var definition = new Faker(2026).Define<DefinitionStudent>()
-                .RuleFor<string>(x => x.FirstName, null!);
+                .RuleFor<string>(x => x.FirstName, (Func<FakerContext, string>)null!);
 
             AssertSingleError(definition, ConfigurationErrorCodes.NullValueFactory);
         }
@@ -274,7 +274,7 @@ namespace ArabFaker.Tests.Generation
         public void RuleFor_NullSelectorAndFactory_ShouldReportBothErrors()
         {
             var definition = new Faker(2026).Define<DefinitionStudent>()
-                .RuleFor<string>(null!, null!);
+                .RuleFor<string>(null!, (Func<FakerContext, string>)null!);
 
             Assert.Equal(2, definition.ConfigurationErrors.Count);
             Assert.Equal(0, definition.RuleCount);

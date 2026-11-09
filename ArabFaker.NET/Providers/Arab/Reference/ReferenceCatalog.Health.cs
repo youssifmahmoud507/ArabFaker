@@ -37,6 +37,21 @@
             new("طب الأسرة", "Family Medicine"),
             new("التغذية العلاجية", "Clinical Nutrition"),
             new("حديثو الولادة", "Neonatology"),
+            new("جراحة القلب والصدر", "Cardiothoracic Surgery"),
+            new("جراحة الأطفال", "Pediatric Surgery"),
+            new("الطب النووي", "Nuclear Medicine"),
+            new("طب الشيخوخة", "Geriatrics"),
+            new("الحساسية والمناعة", "Allergy and Immunology"),
+            new("طب الألم", "Pain Medicine"),
+            new("الطب الشرعي", "Forensic Medicine"),
+            new("الطب الرياضي", "Sports Medicine"),
+            new("جراحة الفم والوجه والفكين", "Oral and Maxillofacial Surgery"),
+            new("تقويم الأسنان", "Orthodontics"),
+            new("علاج الجذور", "Endodontics"),
+            new("العناية المركزة", "Critical Care Medicine"),
+            new("السمعيات", "Audiology"),
+            new("التخاطب", "Speech Therapy"),
+            new("أمراض الذكورة", "Andrology"),
         ];
 
         /// <summary>ABO and Rh blood groups.</summary>

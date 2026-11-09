@@ -2,6 +2,7 @@ using ArabFaker.NET;
 using ArabFaker.NET.Generation;
 using ArabFaker.NET.Providers.Arab.Names;
 using ArabFaker.NET.Providers.Arab.Reference;
+using System.Reflection;
 
 namespace ArabFaker.Tests.Providers.Arab.Reference
 {
@@ -18,64 +19,120 @@ namespace ArabFaker.Tests.Providers.Arab.Reference
             return new FakerContext(new GenerationContext(factory, "reference-tests", itemIndex));
         }
 
-        public static TheoryData<string> SimpleMethods => new()
+        private static IEnumerable<MethodInfo> TryMethods() =>
+            typeof(ReferenceGenerator).GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .Where(x => x.Name.StartsWith("Try", StringComparison.Ordinal));
+
+        private static bool IsLanguageMethod(MethodInfo method)
         {
-            "Faculty", "University", "EducationLevel", "AcademicYear", "Industry", "ProductCategory",
-            "PaymentMethod", "Bank", "MedicalSpecialty", "MaritalStatus", "Country", "Language", "Color",
-            "DayName", "MonthName", "AcademicDepartment", "Course", "Department", "JobTitle"
-        };
+            var parameters = method.GetParameters();
+
+            return parameters.Length == 2
+                && parameters[0].ParameterType == typeof(string).MakeByRefType()
+                && parameters[1].ParameterType == typeof(NameLanguage);
+        }
+
+        private static bool IsNeutralMethod(MethodInfo method)
+        {
+            var parameters = method.GetParameters();
+
+            return parameters.Length == 1 && parameters[0].ParameterType == typeof(string).MakeByRefType();
+        }
+
+        // Every "TryX(out string value, NameLanguage language)" method, found automatically.
+        public static TheoryData<string> LanguageMethods
+        {
+            get
+            {
+                var data = new TheoryData<string>();
+
+                foreach (var method in TryMethods().Where(IsLanguageMethod))
+                    data.Add(method.Name);
+
+                return data;
+            }
+        }
+
+        // Every "TryX(out string value)" method (blood types, currency codes...), found automatically.
+        public static TheoryData<string> NeutralMethods
+        {
+            get
+            {
+                var data = new TheoryData<string>();
+
+                foreach (var method in TryMethods().Where(IsNeutralMethod))
+                    data.Add(method.Name);
+
+                return data;
+            }
+        }
 
         private static bool Call(string method, ReferenceGenerator reference, NameLanguage language, out string value)
         {
-            return method switch
-            {
-                "Faculty" => reference.TryFaculty(out value, language),
-                "University" => reference.TryUniversity(out value, language),
-                "EducationLevel" => reference.TryEducationLevel(out value, language),
-                "AcademicYear" => reference.TryAcademicYear(out value, language),
-                "Industry" => reference.TryIndustry(out value, language),
-                "ProductCategory" => reference.TryProductCategory(out value, language),
-                "PaymentMethod" => reference.TryPaymentMethod(out value, language),
-                "Bank" => reference.TryBank(out value, language),
-                "MedicalSpecialty" => reference.TryMedicalSpecialty(out value, language),
-                "MaritalStatus" => reference.TryMaritalStatus(out value, language),
-                "Country" => reference.TryCountry(out value, language),
-                "Language" => reference.TryLanguage(out value, language),
-                "Color" => reference.TryColor(out value, language),
-                "DayName" => reference.TryDayName(out value, language),
-                "MonthName" => reference.TryMonthName(out value, language),
-                "AcademicDepartment" => reference.TryAcademicDepartment(out value, language),
-                "Course" => reference.TryCourse(out value, language),
-                "Department" => reference.TryDepartment(out value, language),
-                "JobTitle" => reference.TryJobTitle(out value, language),
-                _ => throw new ArgumentException(method)
-            };
+            object?[] args = [null, language];
+
+            bool success = (bool)typeof(ReferenceGenerator).GetMethod(method)!.Invoke(reference, args)!;
+
+            value = (string)args[0]!;
+
+            return success;
+        }
+
+        private static bool CallNeutral(string method, ReferenceGenerator reference, out string value)
+        {
+            object?[] args = [null];
+
+            bool success = (bool)typeof(ReferenceGenerator).GetMethod(method)!.Invoke(reference, args)!;
+
+            value = (string)args[0]!;
+
+            return success;
+        }
+
+        [Fact]
+        public void Generator_ShouldExposeManyMethods()
+        {
+            Assert.True(LanguageMethods.Count() >= 40);
+            Assert.True(NeutralMethods.Count() >= 5);
         }
 
         [Theory]
-        [MemberData(nameof(SimpleMethods))]
-        public void Method_ShouldReturnArabicOrLatinText(string method)
+        [MemberData(nameof(LanguageMethods))]
+        public void LanguageMethod_ShouldReturnArabicOrLatinText(string method)
         {
             var reference = CreateContext().Reference;
 
             for (int i = 0; i < 30; i++)
             {
                 Assert.True(Call(method, reference, NameLanguage.Arabic, out string arabic));
-                Assert.True(HasArabic(arabic) && !HasLatin(arabic), $"'{arabic}'");
+                Assert.True(HasArabic(arabic) && !HasLatin(arabic), $"{method}: '{arabic}'");
 
                 Assert.True(Call(method, reference, NameLanguage.Latin, out string latin));
-                Assert.True(HasLatin(latin) && !HasArabic(latin), $"'{latin}'");
+                Assert.True(HasLatin(latin) && !HasArabic(latin), $"{method}: '{latin}'");
             }
         }
 
         [Theory]
-        [MemberData(nameof(SimpleMethods))]
-        public void Method_InvalidLanguage_ShouldReturnFalseAndEmptyValue(string method)
+        [MemberData(nameof(LanguageMethods))]
+        public void LanguageMethod_InvalidLanguage_ShouldReturnFalseAndEmptyValue(string method)
         {
             var reference = CreateContext().Reference;
 
             Assert.False(Call(method, reference, (NameLanguage)99, out string value));
             Assert.Empty(value);
+        }
+
+        [Theory]
+        [MemberData(nameof(NeutralMethods))]
+        public void NeutralMethod_ShouldReturnANonEmptyValue(string method)
+        {
+            var reference = CreateContext().Reference;
+
+            for (int i = 0; i < 30; i++)
+            {
+                Assert.True(CallNeutral(method, reference, out string value));
+                Assert.False(string.IsNullOrWhiteSpace(value));
+            }
         }
 
         [Fact]

@@ -16,6 +16,10 @@ Not on NuGet yet. Until a package is published, add a project reference:
 dotnet add reference path/to/ArabFaker.NET/ArabFaker.NET.csproj
 ```
 
+`samples/ArabFaker.DatabaseDemo` loads generated data into a real SQLite database with PRIMARY KEY,
+FOREIGN KEY, UNIQUE and CHECK constraints and verifies it with queries
+(`dotnet run --project samples/ArabFaker.DatabaseDemo`).
+
 A runnable example lives in `samples/ArabFaker.QuickStart` (`dotnet run --project samples/ArabFaker.QuickStart -- --latin`). It writes UTF-8 files to `quickstart-output/`; add `--latin` for English-letter names.
 
 ## What it is, and what it is not
@@ -89,10 +93,11 @@ real clock.
 
 ## Reference data (Part 20)
 
-Closed, well-known lists ship with the library, in Arabic or English: 200 courses grouped under
-20 academic departments, 105 job titles under 15 company departments, faculties, Egyptian
+Closed, well-known lists ship with the library, in Arabic or English: 380 courses grouped under
+38 academic departments, 214 job titles under 23 company departments, about 195 countries, 50
+languages, 65 currency codes, nationalities, school subjects and stages, faculties, Egyptian
 universities, industries, product categories, payment methods, banks, medical specialties,
-countries, languages, colors, blood types, currency codes, weekdays and months.
+sports, hobbies, Egyptian dishes, Hijri and Coptic months and more.
 
 ```csharp
 var faker = new Faker(2026);
@@ -105,6 +110,14 @@ var courses = faker.Define<Course>()
 // A value that must agree with its group:
 c.Reference.TryCourseWithDepartment(out var course, out var department);
 c.Reference.TryJobTitleInDepartment("Finance", out var title, NameLanguage.Latin);
+
+// A value that must agree with another property of the same row (dependent rule):
+faker.Define<Employee>()
+    .AutoFill()                                      // fills Department
+    .RuleFor(x => x.JobTitle,                        // runs after every other rule
+        (x, c) => c.Reference.TryJobTitleInDepartment(x.Department, out var t) ? t : "");
+
+c.Identifiers.GenerateNationalId();                  // 14 random digits, test data only
 ```
 
 Only closed lists are built in. Open-ended records such as orders, invoices or products stay
