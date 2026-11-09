@@ -96,6 +96,10 @@ namespace ArabFaker.NET.Generation
             if (isPrimaryKey)
                 return context => context.Identifiers.GenerateGuidString();
 
+            // "NationalId" ends with "Id" but is a value, not a reference to another table.
+            if (key is "nationalid" or "nationalidnumber" or "nid")
+                return context => context.Identifiers.GenerateNationalId();
+
             if (isKeyColumn)
                 return null;
 
@@ -225,6 +229,68 @@ namespace ArabFaker.NET.Generation
                 case "currency":
                 case "currencycode":
                     return context => context.Reference.TryCurrencyCode(out string value) ? value : string.Empty;
+
+                case "nationality":
+                    return context => context.Reference.TryNationality(out string value, language) ? value : string.Empty;
+
+                case "gender":
+                case "sex":
+                    return context => context.Reference.TryGender(out string value, language) ? value : string.Empty;
+
+                case "schoolsubject":
+                    return context => context.Reference.TrySchoolSubject(out string value, language) ? value : string.Empty;
+
+                case "schoolstage":
+                    return context => context.Reference.TrySchoolStage(out string value, language) ? value : string.Empty;
+
+                case "sport":
+                case "favoritesport":
+                    return context => context.Reference.TrySport(out string value, language) ? value : string.Empty;
+
+                case "hobby":
+                    return context => context.Reference.TryHobby(out string value, language) ? value : string.Empty;
+
+                case "animal":
+                    return context => context.Reference.TryAnimal(out string value, language) ? value : string.Empty;
+
+                case "fruit":
+                    return context => context.Reference.TryFruit(out string value, language) ? value : string.Empty;
+
+                case "vegetable":
+                    return context => context.Reference.TryVegetable(out string value, language) ? value : string.Empty;
+
+                case "carbrand":
+                    return context => context.Reference.TryCarBrand(out string value, language) ? value : string.Empty;
+
+                case "season":
+                    return context => context.Reference.TrySeason(out string value, language) ? value : string.Empty;
+
+                case "zodiac":
+                case "zodiacsign":
+                    return context => context.Reference.TryZodiacSign(out string value, language) ? value : string.Empty;
+
+                case "continent":
+                    return context => context.Reference.TryContinent(out string value, language) ? value : string.Empty;
+
+                case "planet":
+                    return context => context.Reference.TryPlanet(out string value, language) ? value : string.Empty;
+
+                case "priority":
+                    return context => context.Reference.TryPriority(out string value, language) ? value : string.Empty;
+
+                case "touristattraction":
+                case "attraction":
+                    return context => context.Reference.TryTouristAttraction(out string value, language) ? value : string.Empty;
+
+                case "programminglanguage":
+                    return context => context.Reference.TryProgrammingLanguage(out string value) ? value : string.Empty;
+
+                case "operatingsystem":
+                case "os":
+                    return context => context.Reference.TryOperatingSystem(out string value) ? value : string.Empty;
+
+                case "clothingsize":
+                    return context => context.Reference.TryClothingSize(out string value) ? value : string.Empty;
 
                 default:
                     return null;

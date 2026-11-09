@@ -73,3 +73,9 @@ jobs:
 
       - name: Run the quick-start sample
         run: dotnet run --project samples/ArabFaker.QuickStart/ArabFaker.QuickStart.csproj --configuration Release
+
+      - name: Run the database demo (real SQLite database, Arabic)
+        run: dotnet run --project samples/ArabFaker.DatabaseDemo/ArabFaker.DatabaseDemo.csproj --configuration Release
+
+      - name: Run the database demo (real SQLite database, English letters, another seed)
+        run: dotnet run --project samples/ArabFaker.DatabaseDemo/ArabFaker.DatabaseDemo.csproj --configuration Release -- --latin --seed 7

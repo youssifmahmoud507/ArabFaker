@@ -47,6 +47,20 @@ namespace ArabFaker.Tests.Generation
         public string Title { get; set; } = string.Empty;
     }
 
+    internal sealed class RefCitizen
+    {
+        public int Id { get; set; }
+        public string NationalId { get; set; } = string.Empty;
+        public string Nationality { get; set; } = string.Empty;
+        public string Gender { get; set; } = string.Empty;
+        public string Hobby { get; set; } = string.Empty;
+        public string Season { get; set; } = string.Empty;
+        public string Priority { get; set; } = string.Empty;
+        public string ProgrammingLanguage { get; set; } = string.Empty;
+        public string ClothingSize { get; set; } = string.Empty;
+        public int GenderId { get; set; }
+    }
+
     public class AutoFillReferenceTests
     {
         private static bool HasArabic(string text) => text.Any(c => c >= '؀' && c <= 'ۿ');
@@ -118,6 +132,28 @@ namespace ArabFaker.Tests.Generation
             });
 
             Assert.Equal(new[] { "Category", "Title" }, definition.UnmappedProperties.OrderBy(x => x));
+        }
+
+        [Fact]
+        public void AutoFill_NationalId_ShouldBeFourteenDigits_AndOtherIdsStayUnmapped()
+        {
+            var definition = new Faker(1).Define<RefCitizen>().AutoFill();
+            var rows = definition.Generate(30).Value!;
+
+            Assert.All(rows, row =>
+            {
+                Assert.Equal(14, row.NationalId.Length);
+                Assert.All(row.NationalId, c => Assert.InRange(c, '0', '9'));
+                Assert.True(Contains(ReferenceCatalog.Nationalities, row.Nationality));
+                Assert.True(Contains(ReferenceCatalog.Genders, row.Gender));
+                Assert.True(Contains(ReferenceCatalog.Hobbies, row.Hobby));
+                Assert.True(Contains(ReferenceCatalog.Seasons, row.Season));
+                Assert.True(Contains(ReferenceCatalog.Priorities, row.Priority));
+                Assert.Contains(row.ProgrammingLanguage, ReferenceCatalog.ProgrammingLanguages);
+                Assert.Contains(row.ClothingSize, ReferenceCatalog.ClothingSizes);
+            });
+
+            Assert.Equal(new[] { "GenderId" }, definition.UnmappedProperties);
         }
     }
 }

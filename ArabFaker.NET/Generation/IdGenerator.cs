@@ -14,6 +14,39 @@ namespace ArabFaker.NET.Generation
             _randomSource = randomSource;
         }
 
+        /// <summary>
+        /// Builds a string of <paramref name="length"/> random decimal digits (leading zeros allowed).
+        /// </summary>
+        internal string NextDigits(int length)
+        {
+            if (length <= 0)
+                return string.Empty;
+
+            Span<byte> buffer = stackalloc byte[32];
+            Span<char> digits = length <= 64 ? stackalloc char[length] : new char[length];
+
+            int filled = 0;
+
+            while (filled < digits.Length)
+            {
+                _randomSource.NextBytes(buffer);
+
+                foreach (byte value in buffer)
+                {
+                    // 250 is the largest multiple of 10 that fits in a byte, so every digit is equally likely.
+                    if (value >= 250)
+                        continue;
+
+                    digits[filled++] = (char)('0' + (value % 10));
+
+                    if (filled == digits.Length)
+                        break;
+                }
+            }
+
+            return new string(digits);
+        }
+
         internal Guid NextGuid()
         {
             Span<byte> bytes = stackalloc byte[16];

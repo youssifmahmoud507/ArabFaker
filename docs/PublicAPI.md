@@ -154,6 +154,7 @@ public int RuleCount
 public bool IsFrozen
 public IReadOnlyList<string> UnmappedProperties
 public FakerDefinition<T> RuleFor<TProperty>(
+public FakerDefinition<T> RuleFor<TProperty>(   // dependent: Func<T, FakerContext, TProperty>
 public FakerDefinition<T> AutoFill()
 public FakerDefinition<T> AutoFill(AutoFillOptions options)
 public FakerDefinition<T> Freeze()
@@ -273,6 +274,27 @@ public bool TryLanguage(out string value, NameLanguage language = NameLanguage.A
 public bool TryColor(out string value, NameLanguage language = NameLanguage.Arabic)
 public bool TryDayName(out string value, NameLanguage language = NameLanguage.Arabic)
 public bool TryMonthName(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryNationality(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TrySchoolSubject(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TrySchoolStage(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryGradeRating(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TrySport(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryHobby(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryAnimal(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryFruit(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryVegetable(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryEgyptianDish(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryFamilyRelation(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryCarBrand(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryGender(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TrySeason(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryHijriMonth(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryCopticMonth(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryZodiacSign(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryContinent(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryPlanet(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryTouristAttraction(out string value, NameLanguage language = NameLanguage.Arabic)
+public bool TryPriority(out string value, NameLanguage language = NameLanguage.Arabic)
 public bool TryAcademicDepartment(out string value, NameLanguage language = NameLanguage.Arabic)
 public bool TryCourse(out string value, NameLanguage language = NameLanguage.Arabic)
 public bool TryCourseWithDepartment(out string course, out string department, NameLanguage language = NameLanguage.Arabic)
@@ -283,6 +305,9 @@ public bool TryJobTitleWithDepartment(out string jobTitle, out string department
 public bool TryJobTitleInDepartment(string department, out string jobTitle, NameLanguage language = NameLanguage.Arabic)
 public bool TryBloodType(out string value)
 public bool TryCurrencyCode(out string value)
+public bool TryProgrammingLanguage(out string value)
+public bool TryOperatingSystem(out string value)
+public bool TryClothingSize(out string value)
 ```
 
 ## DatesGenerator  (`ArabFaker.NET.Providers.Common.Dates`)
@@ -300,6 +325,7 @@ public bool TryDateOfBirth(DateOnly asOfDate, int minAge, int maxAge, out DateOn
 public sealed class IdentifierGenerator
 public Guid GenerateGuid()
 public string GenerateGuidString()
+public string GenerateNationalId()
 ```
 
 ## InternetGenerator  (`ArabFaker.NET.Providers.Common.Internet`)
