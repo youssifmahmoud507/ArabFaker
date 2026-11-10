@@ -65,7 +65,7 @@ namespace ArabFaker.NET
         {
             if (factory is null)
             {
-                return CreateDefinition<T>(null,[new ConfigurationError(ConfigurationErrorCodes.NullFactory, "The factory cannot be null.")]);
+                return CreateDefinition<T>(null, [new ConfigurationError(ConfigurationErrorCodes.NullFactory, "The factory cannot be null.")]);
             }
 
             return CreateDefinition(factory, []);

@@ -1,4 +1,4 @@
-﻿using ArabFaker.NET.Generation;
+﻿﻿using ArabFaker.NET.Generation;
 using ArabFaker.NET.Generation.Randomization;
 using ArabFaker.NET.Providers.Arab.Locations;
 using System;
@@ -23,7 +23,7 @@ namespace ArabFaker.Tests.Providers.Arab.Locations
 
             var resources = assembly.GetManifestResourceNames();
 
-            string[] expectedResources =["ArabFaker.Data.Locations.Egypt.all-governorate.json", "ArabFaker.Data.Locations.Egypt.all-district.json", "ArabFaker.Data.Locations.Egypt.all-shiyakha.json"
+            string[] expectedResources = ["ArabFaker.Data.Locations.Egypt.all-governorate.json", "ArabFaker.Data.Locations.Egypt.all-district.json", "ArabFaker.Data.Locations.Egypt.all-shiyakha.json"
             ];
 
             var missingResources = expectedResources.Where(expected => !resources.Contains(expected)).ToArray();

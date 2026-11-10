@@ -127,6 +127,9 @@ namespace ArabFaker.NET.Export
                         : ((IFormattable)Convert.ChangeType(item, Enum.GetUnderlyingType(item.GetType()), Invariant))
                             .ToString(null, Invariant);
 
+                case byte or sbyte or short or ushort or int or uint or long or ulong or float or double or decimal:
+                    return ToText(value);
+
                 default:
                     // Unknown types are never written raw: quoting keeps a stray value from becoming SQL.
                     return QuoteText(ToText(value), options.Dialect);

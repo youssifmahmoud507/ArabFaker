@@ -16,6 +16,9 @@ jobs:
   analysis:
     name: Scorecard analysis
     runs-on: ubuntu-latest
+    # The action pulls its image from gcr.io, which currently answers "billing must be enabled" for anonymous pulls.
+    # That is outside this repository, so a failure is reported but must not turn master red.
+    continue-on-error: true
     permissions:
       security-events: write
       id-token: write

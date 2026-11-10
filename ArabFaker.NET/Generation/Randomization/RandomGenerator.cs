@@ -1,4 +1,4 @@
-﻿namespace ArabFaker.NET.Generation.Randomization
+﻿﻿namespace ArabFaker.NET.Generation.Randomization
 {
     internal sealed class RandomGenerator
     {
@@ -145,7 +145,7 @@
                     return false;
                 }
 
-                (values[i], values[randomIndex]) =(values[randomIndex], values[i]);
+                (values[i], values[randomIndex]) = (values[randomIndex], values[i]);
 
                 selected[i] = values[i];
             }
