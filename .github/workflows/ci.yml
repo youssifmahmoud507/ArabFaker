@@ -8,6 +8,11 @@ on:
 permissions:
   contents: read
 
+# A newer push to the same branch or PR makes the older run pointless.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-test:
     name: Build and test (${{ matrix.os }})
@@ -30,7 +35,19 @@ jobs:
         run: dotnet build --configuration Release --no-restore -p:ContinuousIntegrationBuild=true
 
       - name: Test
+        if: matrix.os != 'ubuntu-latest'
         run: dotnet test --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" --results-directory TestResults
+
+      - name: Test (with coverage)
+        if: matrix.os == 'ubuntu-latest'
+        run: dotnet test --configuration Release --no-build --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test-results.trx" --results-directory TestResults
+
+      - name: Coverage summary
+        if: matrix.os == 'ubuntu-latest' && always()
+        run: |
+          dotnet tool install --global dotnet-reportgenerator-globaltool
+          reportgenerator -reports:"TestResults/**/coverage.cobertura.xml" -targetdir:coverage-report -reporttypes:"MarkdownSummaryGithub;Cobertura"
+          cat coverage-report/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload test results
         if: always()
@@ -38,6 +55,36 @@ jobs:
         with:
           name: test-results-${{ matrix.os }}
           path: TestResults
+
+      - name: Upload coverage report
+        if: matrix.os == 'ubuntu-latest' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage-report
+
+  samples:
+    name: Run the samples
+    needs: build-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Quick-start sample (Arabic)
+        run: dotnet run --project samples/ArabFaker.QuickStart/ArabFaker.QuickStart.csproj --configuration Release
+
+      - name: Quick-start sample (English letters)
+        run: dotnet run --project samples/ArabFaker.QuickStart/ArabFaker.QuickStart.csproj --configuration Release -- --latin
+
+      - name: Database demo (real SQLite database, Arabic)
+        run: dotnet run --project samples/ArabFaker.DatabaseDemo/ArabFaker.DatabaseDemo.csproj --configuration Release
+
+      - name: Database demo (real SQLite database, English letters, another seed)
+        run: dotnet run --project samples/ArabFaker.DatabaseDemo/ArabFaker.DatabaseDemo.csproj --configuration Release -- --latin --seed 7
 
   package:
     name: Pack and smoke test
@@ -65,17 +112,60 @@ jobs:
             echo "Test artifacts found in package"; exit 1
           fi
 
+      # Installs the .nupkg into a brand new project, like a real user would, and generates data.
+      - name: Consumer smoke test (install the package and use it)
+        run: |
+          package=$(ls artifacts/*.nupkg | head -n 1)
+          version=$(basename "$package" .nupkg)
+          version=${version#ArabFaker.NET.}
+          echo "Testing version $version"
+
+          mkdir -p "$RUNNER_TEMP/consumer" && cd "$RUNNER_TEMP/consumer"
+          dotnet new console --framework net10.0 --name Consumer --output . --no-restore
+          dotnet add package ArabFaker.NET --version "$version" --source "$GITHUB_WORKSPACE/artifacts" --source https://api.nuget.org/v3/index.json
+
+          cat > Program.cs <<'CS'
+          using ArabFaker.NET;
+          using ArabFaker.NET.Export;
+
+          var people = new Faker(1).Define<Person>().AutoFill().Generate(5);
+
+          if (!people.IsSuccess)
+          {
+              foreach (var error in people.Errors)
+                  Console.Error.WriteLine($"{error.Code}: {error.Message}");
+
+              return 1;
+          }
+
+          var csv = RowExporter.ToCsv(people.Value);
+
+          if (!csv.IsSuccess || csv.Value.Split('\n').Length < 6)
+          {
+              Console.Error.WriteLine("CSV export failed");
+
+              return 1;
+          }
+
+          Console.WriteLine("Installed package works.");
+
+          return 0;
+
+          internal sealed class Person
+          {
+              public int Id { get; set; }
+              public string FirstName { get; set; } = "";
+              public string LastName { get; set; } = "";
+              public string Email { get; set; } = "";
+              public string NationalId { get; set; } = "";
+              public string JobTitle { get; set; } = "";
+          }
+          CS
+
+          dotnet run
+
       - name: Upload package
         uses: actions/upload-artifact@v4
         with:
           name: nupkg
           path: artifacts/*.nupkg
-
-      - name: Run the quick-start sample
-        run: dotnet run --project samples/ArabFaker.QuickStart/ArabFaker.QuickStart.csproj --configuration Release
-
-      - name: Run the database demo (real SQLite database, Arabic)
-        run: dotnet run --project samples/ArabFaker.DatabaseDemo/ArabFaker.DatabaseDemo.csproj --configuration Release
-
-      - name: Run the database demo (real SQLite database, English letters, another seed)
-        run: dotnet run --project samples/ArabFaker.DatabaseDemo/ArabFaker.DatabaseDemo.csproj --configuration Release -- --latin --seed 7
