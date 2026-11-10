@@ -34,9 +34,12 @@ jobs:
         continue-on-error: true
         run: |
           pip install zizmor
+          zizmor --format plain .github || true
           zizmor --format sarif .github > zizmor.sarif || true
+      # Pull requests only print the findings above. Uploading them there would add a "Code scanning results"
+      # check that fails the PR on every new alert; the Security tab is fed from master and the weekly run instead.
       - name: Upload findings
-        if: ${{ hashFiles('zizmor.sarif') != '' }}
+        if: ${{ github.event_name != 'pull_request' && hashFiles('zizmor.sarif') != '' }}
         continue-on-error: true
         uses: github/codeql-action/upload-sarif@v3
         with:

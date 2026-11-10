@@ -77,7 +77,7 @@ namespace ArabFaker.Tests.Security
 
         private static string RandomText(Random random)
         {
-            const string alphabet = "abcXYZ019 '\"\;,-/*=`[]()\r\n\t\u0645\u062D\u0645\u062F";
+            const string alphabet = "abcXYZ019 '\"\\;,-/*=`[]()\r\n\t\u0645\u062D\u0645\u062F";
             int length = random.Next(0, 40);
             var builder = new StringBuilder(length);
 

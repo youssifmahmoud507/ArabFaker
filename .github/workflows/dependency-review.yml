@@ -12,6 +12,9 @@ jobs:
   dependency-review:
     name: Review new dependencies
     runs-on: ubuntu-latest
+    # Needs "Dependency graph" enabled in Settings > Advanced Security. Until then the action errors out on every PR,
+    # so a failure here is reported but does not block merging. Remove this line once the graph is on.
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
