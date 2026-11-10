@@ -122,7 +122,10 @@ jobs:
 
           mkdir -p "$RUNNER_TEMP/consumer" && cd "$RUNNER_TEMP/consumer"
           dotnet new console --framework net10.0 --name Consumer --output . --no-restore
-          dotnet add package ArabFaker.NET --version "$version" --source "$GITHUB_WORKSPACE/artifacts" --source https://api.nuget.org/v3/index.json
+          # dotnet add package takes a single --source, so list both sources in a nuget.config.
+          dotnet new nugetconfig
+          dotnet nuget add source "$GITHUB_WORKSPACE/artifacts" --name local-build --configfile nuget.config
+          dotnet add package ArabFaker.NET --version "$version"
 
           cat > Program.cs <<'CS'
           using ArabFaker.NET;
