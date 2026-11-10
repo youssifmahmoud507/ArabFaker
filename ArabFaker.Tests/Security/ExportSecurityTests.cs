@@ -230,6 +230,39 @@ namespace ArabFaker.Tests.Security
             }
         }
 
+        [Theory]
+        [InlineData("=1+1", "'=1+1")]
+        [InlineData("+SUM(A1)", "'+SUM(A1)")]
+        [InlineData("-2+3", "'-2+3")]
+        [InlineData("@cmd", "'@cmd")]
+        [InlineData("\tTabbed", "'\tTabbed")]
+        [InlineData("Ali", "Ali")]
+        [InlineData("a=b", "a=b")]
+        [InlineData("", "")]
+        public void Csv_NeutralizeFormulas_PrefixesOnlyDangerousText(string input, string expected)
+        {
+            var result = RowExporter.ToCsv(new[] { new Row { Id = 1, Name = input } }, new CsvExportOptions { NeutralizeFormulas = true });
+
+            Assert.True(result.IsSuccess);
+            Assert.Equal(expected, ParseCsv(result.Value!)[1][1]);
+        }
+
+        [Fact]
+        public void Csv_NeutralizeFormulas_KeepsNegativeNumbers()
+        {
+            var result = RowExporter.ToCsv(new[] { new Row { Id = -5, Name = "x" } }, new CsvExportOptions { NeutralizeFormulas = true });
+
+            Assert.Equal("-5", ParseCsv(result.Value!)[1][0]);
+        }
+
+        [Fact]
+        public void Csv_Default_LeavesTextUntouched()
+        {
+            var result = RowExporter.ToCsv(new[] { new Row { Id = 1, Name = "=1+1" } });
+
+            Assert.Equal("=1+1", ParseCsv(result.Value!)[1][1]);
+        }
+
         // A minimal RFC 4180 reader, so the test checks the file a spreadsheet would actually read.
         private static List<List<string>> ParseCsv(string text)
         {
