@@ -68,7 +68,8 @@ jobs:
         run: |
           dotnet run --project samples/ArabFaker.QuickStart/ArabFaker.QuickStart.csproj --configuration Release -- --out out
           # Line endings are part of the format on purpose (CSV is CRLF), so hash the files as they are.
-          (cd out && sha256sum people.csv people.json dataset.json dataset.sql | tee ../hashes.txt)
+          # Windows' sha256sum marks files with "*" (binary mode); normalise it so only the hashes are compared.
+          (cd out && sha256sum people.csv people.json dataset.json dataset.sql | sed 's/ \*/  /' | tee ../hashes.txt)
 
       - uses: actions/upload-artifact@v4
         with:

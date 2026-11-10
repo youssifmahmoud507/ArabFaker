@@ -1,4 +1,4 @@
-﻿using ArabFaker.NET.Generation.Randomization;
+﻿﻿﻿﻿using ArabFaker.NET.Generation.Randomization;
 
 namespace ArabFaker.NET.Providers.Arab.Locations
 {
@@ -15,7 +15,7 @@ namespace ArabFaker.NET.Providers.Arab.Locations
         {
             location = default;
 
-            if (!Enum.IsDefined(typeof(LocationLevel), level))
+            if (!Enum.IsDefined(level))
                 return false;
 
             if (!LocationCatalog.TryGet(out var catalog))
@@ -46,7 +46,7 @@ namespace ArabFaker.NET.Providers.Arab.Locations
         {
             name = string.Empty;
 
-            if (!Enum.IsDefined(typeof(LocationLanguage), language))
+            if (!Enum.IsDefined(language))
                 return false;
 
             if (!TryPick(level, out LocationEntry location))
@@ -62,7 +62,7 @@ namespace ArabFaker.NET.Providers.Arab.Locations
             if (string.IsNullOrWhiteSpace(parentId))
                 return false;
 
-            if (!Enum.IsDefined(typeof(LocationLevel), childLevel))
+            if (!Enum.IsDefined(childLevel))
                 return false;
 
             if (!LocationCatalog.TryGet(out var catalog))

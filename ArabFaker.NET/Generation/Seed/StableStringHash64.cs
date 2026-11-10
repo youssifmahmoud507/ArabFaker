@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,9 +6,9 @@ namespace ArabFaker.NET.Generation.Seed
 {
     internal static class StableStringHash64
     {
-        private const ulong OffsetBasis =14695981039346656037UL;
+        private const ulong OffsetBasis = 14695981039346656037UL;
 
-        private const ulong Prime =1099511628211UL;
+        private const ulong Prime = 1099511628211UL;
 
         internal static ulong Compute(ReadOnlySpan<char> value)
         {

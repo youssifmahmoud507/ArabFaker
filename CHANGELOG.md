@@ -23,6 +23,13 @@ versions below `1.0.0` may change the public API.
   (time zones / globalization), mutation testing, link check and a code-quality report. Releases carry build provenance and an SBOM.
 - Export security tests: hostile text round-trips through a real SQLite database, JSON and CSV.
 
+### Fixed
+
+- SQL export wrote numbers inside quotes after the "never write unknown types raw" hardening; numeric types are written bare again.
+- Formatting and analyzer findings from the quality report (whitespace, `Enum.IsDefined<T>`, xUnit2012).
+- Compatibility workflow: Windows' `sha256sum` marker no longer makes identical files look different.
+- Scorecard and Dependency review no longer turn builds red for reasons outside the code (gcr.io billing, Dependency graph setting).
+
 ### Security
 
 - SQL export never writes a value of an unexpected type unquoted.

@@ -234,7 +234,7 @@ static (DemoData? Data, IReadOnlyList<GenerationError> Errors) BuildDemo(long se
         12,
         x => x.Id);
 
-    dataset.Table(faker.Define<Enrollment>().AutoFill(options).RuleFor(x => x.GradeRating, c => c.Reference.TryGradeRating(out string grade, language) ? grade : string.Empty),150, x => x.Id).ForeignKey(x => x.StudentId, students).ForeignKey(x => x.CourseId, courses).UniqueTogether(x => x.StudentId, x => x.CourseId);
+    dataset.Table(faker.Define<Enrollment>().AutoFill(options).RuleFor(x => x.GradeRating, c => c.Reference.TryGradeRating(out string grade, language) ? grade : string.Empty), 150, x => x.Id).ForeignKey(x => x.StudentId, students).ForeignKey(x => x.CourseId, courses).UniqueTogether(x => x.StudentId, x => x.CourseId);
 
     var built = dataset.Build();
 

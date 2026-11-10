@@ -1,4 +1,4 @@
-﻿using ArabFaker.NET.Generation.Randomization;
+﻿﻿using ArabFaker.NET.Generation.Randomization;
 
 namespace ArabFaker.NET.Generation.Seed
 {
@@ -14,7 +14,7 @@ namespace ArabFaker.NET.Generation.Seed
 
             ulong state = rootSeed ^ streamHash ^ StreamDomain;
 
-            state = unchecked( state + (itemIndex * IndexMultiplier));
+            state = unchecked(state + (itemIndex * IndexMultiplier));
 
             return SplitMix64.Next(ref state);
         }

@@ -1,4 +1,4 @@
-using ArabFaker.NET;
+﻿using ArabFaker.NET;
 using ArabFaker.NET.Generation;
 using ArabFaker.NET.Providers.Arab.Names;
 using ArabFaker.NET.Providers.Arab.Reference;
@@ -81,7 +81,7 @@ namespace ArabFaker.Tests.Generation
             Assert.All(rows, row =>
             {
                 Assert.True(GroupNameContains(ReferenceCatalog.WorkDepartments, row.Department), row.Department);
-                Assert.True(ReferenceCatalog.WorkDepartments.SelectMany(x => x.Items).Any(x => x.Arabic == row.JobTitle || x.English == row.JobTitle));
+                Assert.Contains(ReferenceCatalog.WorkDepartments.SelectMany(x => x.Items), x => x.Arabic == row.JobTitle || x.English == row.JobTitle);
                 Assert.True(Contains(ReferenceCatalog.Banks, row.Bank));
                 Assert.Contains(row.BloodType, ReferenceCatalog.BloodTypes);
                 Assert.True(Contains(ReferenceCatalog.Countries, row.Country));
@@ -107,7 +107,7 @@ namespace ArabFaker.Tests.Generation
 
             Assert.All(courses, row =>
             {
-                Assert.True(ReferenceCatalog.AcademicDepartments.SelectMany(x => x.Items).Any(x => x.Arabic == row.CourseName));
+                Assert.Contains(ReferenceCatalog.AcademicDepartments.SelectMany(x => x.Items), x => x.Arabic == row.CourseName);
                 Assert.True(GroupNameContains(ReferenceCatalog.AcademicDepartments, row.AcademicDepartment));
                 Assert.True(GroupNameContains(ReferenceCatalog.AcademicDepartments, row.Department));
             });
