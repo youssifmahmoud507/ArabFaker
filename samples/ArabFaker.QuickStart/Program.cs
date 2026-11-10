@@ -53,7 +53,7 @@ var faker = new Faker(seed: 2026);
 var people = faker.Define<Person>().AutoFill(autoFill).Generate(10);
 
 if (!people.IsSuccess)
-    return Fail(people.Errors);
+    return FailAll(people.Errors);
 
 // 2) Related tables: every foreign key points to a row that exists.
 var dataset = faker.CreateDataset();
@@ -75,7 +75,7 @@ dataset.Table(faker.Define<Enrollment>().AutoFill(autoFill), 20, x => x.Id)
 var built = dataset.Build();
 
 if (!built.IsSuccess)
-    return Fail(built.Errors);
+    return FailAll(built.Errors);
 
 // 3) Write everything as UTF-8 files, so the console font and code page do not matter.
 Directory.CreateDirectory(outputFolder);
@@ -94,7 +94,7 @@ var files = new List<(string Name, GenerationResult<string> Content, Encoding En
 foreach (var (name, content, encoding) in files)
 {
     if (!content.IsSuccess)
-        return Fail(content.Errors);
+        return FailAll(content.Errors);
 
     string path = Path.Combine(outputFolder, name);
 
@@ -114,7 +114,7 @@ static int Fail(string message)
     return 1;
 }
 
-static int Fail(IEnumerable<GenerationError> errors)
+static int FailAll(IEnumerable<GenerationError> errors)
 {
     foreach (var error in errors)
         Console.Error.WriteLine($"{error.Code}: {error.Message}");

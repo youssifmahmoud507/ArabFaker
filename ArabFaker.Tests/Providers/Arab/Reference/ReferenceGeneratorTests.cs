@@ -39,33 +39,27 @@ namespace ArabFaker.Tests.Providers.Arab.Reference
             return parameters.Length == 1 && parameters[0].ParameterType == typeof(string).MakeByRefType();
         }
 
-        // Every "TryX(out string value, NameLanguage language)" method, found automatically.
-        public static TheoryData<string> LanguageMethods
+        private static string[] LanguageMethodNames() =>
+            TryMethods().Where(IsLanguageMethod).Select(x => x.Name).ToArray();
+
+        private static string[] NeutralMethodNames() =>
+            TryMethods().Where(IsNeutralMethod).Select(x => x.Name).ToArray();
+
+        private static TheoryData<string> ToTheoryData(string[] names)
         {
-            get
-            {
-                var data = new TheoryData<string>();
+            var data = new TheoryData<string>();
 
-                foreach (var method in TryMethods().Where(IsLanguageMethod))
-                    data.Add(method.Name);
+            foreach (string name in names)
+                data.Add(name);
 
-                return data;
-            }
+            return data;
         }
+
+        // Every "TryX(out string value, NameLanguage language)" method, found automatically.
+        public static TheoryData<string> LanguageMethods => ToTheoryData(LanguageMethodNames());
 
         // Every "TryX(out string value)" method (blood types, currency codes...), found automatically.
-        public static TheoryData<string> NeutralMethods
-        {
-            get
-            {
-                var data = new TheoryData<string>();
-
-                foreach (var method in TryMethods().Where(IsNeutralMethod))
-                    data.Add(method.Name);
-
-                return data;
-            }
-        }
+        public static TheoryData<string> NeutralMethods => ToTheoryData(NeutralMethodNames());
 
         private static bool Call(string method, ReferenceGenerator reference, NameLanguage language, out string value)
         {
@@ -92,8 +86,8 @@ namespace ArabFaker.Tests.Providers.Arab.Reference
         [Fact]
         public void Generator_ShouldExposeManyMethods()
         {
-            Assert.True(LanguageMethods.Count() >= 40);
-            Assert.True(NeutralMethods.Count() >= 5);
+            Assert.True(LanguageMethodNames().Length >= 40);
+            Assert.True(NeutralMethodNames().Length >= 5);
         }
 
         [Theory]
