@@ -8,18 +8,21 @@ namespace ArabFaker.Tests.Providers.Arab.Reference
         private static IEnumerable<FieldInfo> CatalogFields() =>
             typeof(ReferenceCatalog).GetFields(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
 
-        public static TheoryData<string> EntryLists => ListNames(typeof(ReferenceEntry[]));
+        public static TheoryData<string> EntryLists => ToTheoryData(NamesOf(typeof(ReferenceEntry[])));
 
-        public static TheoryData<string> GroupLists => ListNames(typeof(ReferenceGroup[]));
+        public static TheoryData<string> GroupLists => ToTheoryData(NamesOf(typeof(ReferenceGroup[])));
 
-        public static TheoryData<string> CodeLists => ListNames(typeof(string[]));
+        public static TheoryData<string> CodeLists => ToTheoryData(NamesOf(typeof(string[])));
 
-        private static TheoryData<string> ListNames(Type type)
+        private static string[] NamesOf(Type type) =>
+            CatalogFields().Where(x => x.FieldType == type).Select(x => x.Name).ToArray();
+
+        private static TheoryData<string> ToTheoryData(string[] names)
         {
             var data = new TheoryData<string>();
 
-            foreach (var field in CatalogFields().Where(x => x.FieldType == type))
-                data.Add(field.Name);
+            foreach (string name in names)
+                data.Add(name);
 
             return data;
         }
@@ -51,9 +54,9 @@ namespace ArabFaker.Tests.Providers.Arab.Reference
         [Fact]
         public void Catalog_ShouldExposeTheExpectedNumberOfLists()
         {
-            Assert.True(EntryLists.Count() >= 35);
-            Assert.Equal(2, GroupLists.Count());
-            Assert.True(CodeLists.Count() >= 5);
+            Assert.True(NamesOf(typeof(ReferenceEntry[])).Length >= 35);
+            Assert.Equal(2, NamesOf(typeof(ReferenceGroup[])).Length);
+            Assert.True(NamesOf(typeof(string[])).Length >= 5);
         }
 
         [Theory]
