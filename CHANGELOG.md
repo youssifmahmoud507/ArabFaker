@@ -18,6 +18,16 @@ versions below `1.0.0` may change the public API.
 - Navigation properties and collections for EF-style classes.
 - Export to JSON, CSV and SQL INSERT (Standard, SQL Server, MySQL dialects).
 - CI workflow, NuGet package metadata and a quick-start sample.
+- Security and review workflows: CodeQL (security-extended), vulnerable-package check, secret scan, dependency review,
+  OpenSSF Scorecard, workflow audit (zizmor), fuzzing of the exporters, reproducible-build check, compatibility matrix
+  (time zones / globalization), mutation testing, link check and a code-quality report. Releases carry build provenance and an SBOM.
+- Export security tests: hostile text round-trips through a real SQLite database, JSON and CSV.
+
+### Security
+
+- SQL export never writes a value of an unexpected type unquoted.
+- CSV note: cells that start with `=`, `+`, `-` or `@` are written as they are; spreadsheet programs may treat them as formulas.
+  Do not open generated CSV from untrusted text sources without checking.
 - Reference data (`c.Reference`): 380 courses grouped under 38 academic departments, 214 job titles under 23 company departments, plus about 195 countries, 50 languages, 65 currency codes, nationalities, school subjects and stages, grade ratings, faculties, universities, industries, product categories, payment methods, banks, medical specialties, sports, hobbies, animals, fruits, vegetables, Egyptian dishes, family relations, car brands, Hijri and Coptic months, tourist attractions and more, in Arabic and English. Closed lists only; open-ended records such as orders stay user-defined.
 - `c.Identifiers.GenerateNationalId()`: 14 random digits (no structure, test data only). `AutoFill` fills `NationalId` with it. No phone number generator is provided on purpose.
 - `RuleFor(x => x.P, (x, c) => ...)`: a dependent rule that runs after all other rules and can read the other properties of the same object, so a job title or course can match the department written on the same row.

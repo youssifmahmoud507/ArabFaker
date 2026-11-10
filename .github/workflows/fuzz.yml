@@ -1,0 +1,38 @@
+name: Fuzz
+
+# Runs the export security tests (hostile text through SQL/CSV/JSON, checked in a real SQLite database)
+# many times with different random inputs. The normal CI run uses one fixed seed; this explores more.
+
+on:
+  pull_request:
+    paths:
+      - "ArabFaker.NET/Export/**"
+      - "ArabFaker.Tests/Security/**"
+      - ".github/workflows/fuzz.yml"
+  schedule:
+    - cron: "37 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fuzz-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Build
+        run: dotnet build ArabFaker.Tests/ArabFaker.Tests.csproj --configuration Release
+      - name: Run the security tests 25 times
+        run: |
+          for i in $(seq 1 25); do
+            dotnet test ArabFaker.Tests/ArabFaker.Tests.csproj --configuration Release --no-build --filter "Category=Fuzz" --nologo -v q || exit 1
+          done

@@ -1,0 +1,98 @@
+name: Compatibility
+
+# The library promises the same output for the same seed everywhere. This runs the tests and a real-database
+# check under different time zones (including half-hour and +14h offsets) and with globalization invariant mode
+# on and off, in Debug as well as Release, to catch anything that depends on the machine it runs on.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  schedule:
+    - cron: "11 2 * * 0"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: compat-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  environment-matrix:
+    name: Tests in ${{ matrix.tz }} (invariant globalization ${{ matrix.invariant }}, ${{ matrix.configuration }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { tz: "Africa/Cairo", invariant: "0", configuration: "Release" }
+          - { tz: "Pacific/Kiritimati", invariant: "1", configuration: "Debug" }
+          - { tz: "Pacific/Pago_Pago", invariant: "0", configuration: "Debug" }
+          - { tz: "America/St_Johns", invariant: "1", configuration: "Release" }
+          - { tz: "Asia/Kolkata", invariant: "0", configuration: "Release" }
+    env:
+      TZ: ${{ matrix.tz }}
+      DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: ${{ matrix.invariant }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Test
+        run: dotnet test --configuration ${{ matrix.configuration }}
+
+      - name: Real-database check (SQLite)
+        run: |
+          dotnet run --project samples/ArabFaker.DatabaseDemo/ArabFaker.DatabaseDemo.csproj --configuration ${{ matrix.configuration }}
+          dotnet run --project samples/ArabFaker.DatabaseDemo/ArabFaker.DatabaseDemo.csproj --configuration ${{ matrix.configuration }} -- --latin --seed 99
+
+  same-output-everywhere:
+    name: Same seed gives the same output on every OS
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Generate files with a fixed seed
+        shell: bash
+        run: |
+          dotnet run --project samples/ArabFaker.QuickStart/ArabFaker.QuickStart.csproj --configuration Release -- --out out
+          # Line endings are part of the format on purpose (CSV is CRLF), so hash the files as they are.
+          (cd out && sha256sum people.csv people.json dataset.json dataset.sql | tee ../hashes.txt)
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hashes-${{ matrix.os }}
+          path: hashes.txt
+
+  compare-hashes:
+    name: Compare the files from every OS
+    needs: same-output-everywhere
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: hashes
+
+      - name: Every OS must have produced identical files
+        run: |
+          cd hashes
+          for dir in hashes-*; do echo "== $dir"; cat "$dir/hashes.txt"; done
+          reference=$(cat hashes-ubuntu-latest/hashes.txt)
+          for dir in hashes-*; do
+            if [ "$(cat "$dir/hashes.txt")" != "$reference" ]; then
+              echo "::error::$dir produced different files than ubuntu-latest"
+              exit 1
+            fi
+          done
+          echo "All operating systems produced identical output."

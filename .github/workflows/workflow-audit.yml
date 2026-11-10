@@ -1,0 +1,44 @@
+name: Workflow audit
+
+# Looks for security problems in the workflow files themselves (script injection, over-broad permissions,
+# unpinned or risky actions) with zizmor. Findings show up in the Security tab; this job never blocks a PR.
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - ".github/**"
+  pull_request:
+    paths:
+      - ".github/**"
+  schedule:
+    - cron: "23 4 * * 2"
+
+permissions:
+  contents: read
+
+jobs:
+  zizmor:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run zizmor
+        continue-on-error: true
+        run: |
+          pip install zizmor
+          zizmor --format sarif .github > zizmor.sarif || true
+      - name: Upload findings
+        if: ${{ hashFiles('zizmor.sarif') != '' }}
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: zizmor.sarif
+          category: zizmor

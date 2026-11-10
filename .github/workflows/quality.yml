@@ -1,0 +1,31 @@
+name: Code quality
+
+# Informational report: formatting and compiler/analyzer warnings. Nothing here fails a PR;
+# read the summary to decide what is worth fixing.
+
+on:
+  pull_request:
+  schedule:
+    - cron: "5 6 * * 4"
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Formatting
+        continue-on-error: true
+        run: |
+          echo "### Formatting" >> "$GITHUB_STEP_SUMMARY"
+          dotnet format ArabFaker.slnx --verify-no-changes --verbosity minimal 2>&1 | tail -40 | tee -a "$GITHUB_STEP_SUMMARY" || true
+      - name: Warnings with the latest analyzers
+        continue-on-error: true
+        run: |
+          echo "### Warnings" >> "$GITHUB_STEP_SUMMARY"
+          dotnet build ArabFaker.NET/ArabFaker.NET.csproj --configuration Release -p:AnalysisMode=All -p:EnforceCodeStyleInBuild=true 2>&1 | grep -E "warning (CA|IDE|CS)" | sort -u | head -60 | tee -a "$GITHUB_STEP_SUMMARY" || true

@@ -128,7 +128,8 @@ namespace ArabFaker.NET.Export
                             .ToString(null, Invariant);
 
                 default:
-                    return ToText(value);
+                    // Unknown types are never written raw: quoting keeps a stray value from becoming SQL.
+                    return QuoteText(ToText(value), options.Dialect);
             }
         }
 
