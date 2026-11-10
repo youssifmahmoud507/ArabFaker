@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\ArabFaker.NET\ArabFaker.NET.csproj" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.*" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.*" />
   </ItemGroup>
 
 </Project>
