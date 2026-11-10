@@ -1,0 +1,18 @@
+root = true
+
+[*.cs]
+# Findings from the code-quality report (quality.yml) that are deliberate in this library:
+
+# Null arguments are reported as GenerationResult/ConfigurationError values, never thrown, so the
+# "throw ArgumentNullException" advice does not apply. Each public entry point validates its arguments.
+dotnet_diagnostic.CA1062.severity = none
+
+# Random.Shared only picks a default seed for reproducible test data. Nothing here is a secret or a security decision.
+dotnet_diagnostic.CA5394.severity = none
+
+# Public enum values start at 1 on purpose: 0 is "not set" and is rejected by validation. A 'None' member would be
+# a valid-looking choice and a breaking API change.
+dotnet_diagnostic.CA1008.severity = none
+
+# ToKey returns int or long depending on the key type, so the object return type is required.
+dotnet_diagnostic.CA1859.severity = none
