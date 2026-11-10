@@ -105,7 +105,7 @@
                 new("مخطط إنتاج", "Production Planner"),
                 new("فني صيانة", "Maintenance Technician"),
                 new("مهندس جودة", "Quality Engineer"),
-                new("مشغل ماكينات CNC", "CNC Operator"),
+                new("مشغل ماكينات التحكم الرقمي", "CNC Operator"),
                 new("مدير الإنتاج", "Production Manager"),
                 new("فني تجميع", "Assembly Technician"),
             ]),

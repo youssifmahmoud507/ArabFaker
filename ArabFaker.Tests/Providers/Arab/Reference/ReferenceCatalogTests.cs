@@ -31,7 +31,7 @@ namespace ArabFaker.Tests.Providers.Arab.Reference
             text.Length > 0 && text.All(c => c == ' ' || (c >= '\u0600' && c <= '\u06FF'));
 
         private static bool IsEnglishText(string text) =>
-            text.Length > 0 && char.IsUpper(text[0]) && text.All(c => char.IsLetter(c) || c is ' ' or '\'' or '-' or '&' or '+');
+            text.Length > 0 && char.IsUpper(text[0]) && text.All(c => char.IsLetterOrDigit(c) || c is ' ' or '\'' or '-' or '&' or '+');
 
         private static void AssertValid(IEnumerable<ReferenceEntry> entries)
         {

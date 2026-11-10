@@ -1,0 +1,60 @@
+name: Release
+
+# Runs when you push a tag such as v0.1.0-preview.1.
+# It always builds, tests, packs and creates a GitHub Release with the .nupkg attached.
+# It pushes to NuGet only when the repository has a NUGET_API_KEY secret, and the "nuget"
+# environment can require your approval first (Settings > Environments > nuget > Required reviewers).
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Pack and release
+    runs-on: ubuntu-latest
+    environment: nuget
+    env:
+      NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Check the tag matches the project version
+        run: |
+          project_version=$(dotnet msbuild ArabFaker.NET/ArabFaker.NET.csproj -getProperty:Version)
+          tag_version=${GITHUB_REF_NAME#v}
+          echo "Project version: $project_version, tag: $tag_version"
+          if [ "$project_version" != "$tag_version" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match Version $project_version in ArabFaker.NET.csproj"
+            exit 1
+          fi
+
+      - name: Test
+        run: dotnet test --configuration Release -p:ContinuousIntegrationBuild=true
+
+      - name: Pack
+        run: dotnet pack ArabFaker.NET/ArabFaker.NET.csproj --configuration Release --no-restore -p:ContinuousIntegrationBuild=true --output artifacts
+
+      - name: Create the GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          prerelease=""
+          case "$GITHUB_REF_NAME" in *-*) prerelease="--prerelease" ;; esac
+          gh release create "$GITHUB_REF_NAME" artifacts/*.nupkg --title "$GITHUB_REF_NAME" --generate-notes $prerelease
+
+      - name: Push to NuGet
+        if: ${{ env.NUGET_API_KEY != '' }}
+        run: dotnet nuget push "artifacts/*.nupkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      - name: Note when NuGet was skipped
+        if: ${{ env.NUGET_API_KEY == '' }}
+        run: echo "NUGET_API_KEY is not set, so nothing was pushed to NuGet. The .nupkg is attached to the GitHub Release."

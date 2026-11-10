@@ -48,6 +48,12 @@ dotnet add package ArabFaker.NET --version 0.1.0-preview.1 --source ../../artifa
 - [ ] افتح `arabfaker-sqlserver-demo.sql` في SSMS وتأكد أن العربية تظهر صحيحة.
 - [ ] `dotnet run --project samples/ArabFaker.DatabaseDemo` (SQLite، يعمل في CI أيضًا): كل الفحوص PASS.
 
+## 4.6 الـ Workflows
+
+- [ ] كل Jobs في `CI` خضراء على master (Ubuntu وWindows وsamples وpackage).
+- [ ] `CodeQL` و`Package vulnerabilities` بلا تنبيهات مفتوحة.
+- [ ] سر `NUGET_API_KEY` موجود وبيئة `nuget` عليها Required reviewers (إن أردت الدفع من `release.yml`).
+
 ## 5. النشر (بعد موافقتك فقط)
 
 1. أنشئ Tag: `git tag v0.1.0-preview.1 && git push origin v0.1.0-preview.1`.
