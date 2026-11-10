@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\ArabFaker.NET\ArabFaker.NET.csproj" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.*" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="11.*" />
   </ItemGroup>
 
 </Project>
