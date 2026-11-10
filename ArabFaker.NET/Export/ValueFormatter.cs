@@ -136,6 +136,14 @@ namespace ArabFaker.NET.Export
             }
         }
 
+        /// <summary>Prefixes text that a spreadsheet would read as a formula with an apostrophe.</summary>
+        internal static string NeutralizeFormula(string text)
+        {
+            return text.Length > 0 && text[0] is '=' or '+' or '-' or '@' or '\t' or '\r'
+                ? "'" + text
+                : text;
+        }
+
         internal static string QuoteIdentifier(string name, SqlDialect dialect)
         {
             return dialect switch

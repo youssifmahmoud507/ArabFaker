@@ -182,6 +182,8 @@ var rows = faker.Define<Student>().AutoFill().Generate(100).Value!;
 
 string json = RowExporter.ToJson(rows).Value!;
 string csv  = RowExporter.ToCsv(rows).Value!;
+// For files that people open in Excel and that contain text you do not control:
+// RowExporter.ToCsv(rows, new CsvExportOptions { NeutralizeFormulas = true })
 string sql  = RowExporter.ToSql(rows, new SqlExportOptions { Dialect = SqlDialect.SqlServer }).Value!;
 
 // A whole dataset: INSERT statements with referenced tables first, or one JSON object per table.

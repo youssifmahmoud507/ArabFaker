@@ -32,6 +32,7 @@ versions below `1.0.0` may change the public API.
 
 ### Security
 
+- `CsvExportOptions.NeutralizeFormulas` (opt-in): text cells starting with `=`, `+`, `-`, `@`, tab or CR get a leading apostrophe.
 - SQL export never writes a value of an unexpected type unquoted.
 - CSV note: cells that start with `=`, `+`, `-` or `@` are written as they are; spreadsheet programs may treat them as formulas.
   Do not open generated CSV from untrusted text sources without checking.

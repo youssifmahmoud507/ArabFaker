@@ -43,13 +43,15 @@ namespace ArabFaker.NET.Export
         /// </summary>
         /// <typeparam name="T">The row type.</typeparam>
         /// <param name="rows">The rows to write.</param>
+        /// <param name="options">The CSV settings, or null for the defaults.</param>
         /// <returns>The CSV text, or errors.</returns>
-        public static GenerationResult<string> ToCsv<T>(IEnumerable<T>? rows)
+        public static GenerationResult<string> ToCsv<T>(IEnumerable<T>? rows, CsvExportOptions? options = null)
             where T : class
         {
             if (!TryPrepare(rows, out ExportColumn[] columns, out List<object> items, out GenerationError? error))
                 return GenerationResult<string>.Failure(error);
 
+            bool neutralize = options?.NeutralizeFormulas == true;
             var builder = new StringBuilder();
 
             AppendCsvLine(builder, columns.Select(column => column.Name));
@@ -60,7 +62,12 @@ namespace ArabFaker.NET.Export
                 {
                     object? value = column.Getter(item);
 
-                    return value is null ? string.Empty : ValueFormatter.ToText(value);
+                    if (value is null)
+                        return string.Empty;
+
+                    string text = ValueFormatter.ToText(value);
+
+                    return neutralize && value is string ? ValueFormatter.NeutralizeFormula(text) : text;
                 }));
             }
 

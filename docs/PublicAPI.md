@@ -49,7 +49,7 @@ public bool CamelCase { get; }
 ```csharp
 public static class RowExporter
 public static GenerationResult<string> ToJson<T>(IEnumerable<T>? rows, JsonExportOptions? options = null)
-public static GenerationResult<string> ToCsv<T>(IEnumerable<T>? rows)
+public static GenerationResult<string> ToCsv<T>(IEnumerable<T>? rows, CsvExportOptions? options = null)
 public static GenerationResult<string> ToSql<T>(IEnumerable<T>? rows, SqlExportOptions? options = null)
 ```
 
@@ -359,4 +359,11 @@ public bool TryUppercaseLetters(int length, out string value)
 public bool TryLetters(int length, out string value)
 public bool TryAlphaNumeric(int length, out string value)
 public bool TryHexadecimal(int length, out string value)
+```
+
+```csharp
+public sealed class CsvExportOptions
+{
+    public bool NeutralizeFormulas { get; init; } // default false
+}
 ```
