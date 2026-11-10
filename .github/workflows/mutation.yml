@@ -1,0 +1,41 @@
+name: Mutation testing
+
+# Changes the library's code in small ways (a < becomes <=, a condition is flipped, ...) and checks that the tests
+# notice. A change the tests do not notice points at a test that is missing. Slow, so it only runs when asked.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stryker:
+    name: Stryker.NET
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install Stryker
+        run: dotnet tool install --global dotnet-stryker
+
+      - name: Run Stryker
+        working-directory: ArabFaker.Tests
+        run: dotnet stryker --project ArabFaker.NET.csproj --reporter html --reporter markdown --output ../StrykerOutput
+
+      - name: Summary
+        if: always()
+        run: |
+          report=$(find StrykerOutput -name "*.md" | head -n 1)
+          if [ -n "$report" ]; then cat "$report" >> "$GITHUB_STEP_SUMMARY"; fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stryker-report
+          path: StrykerOutput

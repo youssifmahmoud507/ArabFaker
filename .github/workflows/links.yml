@@ -1,0 +1,31 @@
+name: Link check
+
+on:
+  schedule:
+    - cron: "0 7 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  links:
+    name: Check links in the documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: lycheeverse/lychee-action@v2
+        id: lychee
+        with:
+          args: --no-progress --accept 200,206,429 --exclude-loopback "./**/*.md"
+          fail: false
+
+      - name: Open an issue when links are broken
+        if: steps.lychee.outputs.exit_code != 0
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: Broken links in the documentation
+          content-filepath: ./lychee/out.md
+          labels: documentation

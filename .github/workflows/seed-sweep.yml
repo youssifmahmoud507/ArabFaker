@@ -1,0 +1,55 @@
+name: Seed sweep
+
+# Generates the company and university data for many seeds, in Arabic and in English letters, loads each result
+# into a real SQLite database with PRIMARY KEY, FOREIGN KEY, UNIQUE and CHECK constraints, and makes the
+# database verify it. A rare seed that breaks a rule shows up here, not in a user's project.
+
+on:
+  schedule:
+    - cron: "5 1 * * *"
+  workflow_dispatch:
+    inputs:
+      from:
+        description: First seed
+        default: "1"
+      to:
+        description: Last seed
+        default: "300"
+
+permissions:
+  contents: read
+
+jobs:
+  sweep:
+    name: Seeds ${{ inputs.from || '1' }} to ${{ inputs.to || '300' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build the database demo once
+        run: dotnet build samples/ArabFaker.DatabaseDemo/ArabFaker.DatabaseDemo.csproj --configuration Release --output demo
+
+      - name: Run every seed
+        run: |
+          from=${{ inputs.from || '1' }}
+          to=${{ inputs.to || '300' }}
+          failed=""
+          for seed in $(seq "$from" "$to"); do
+            for mode in "" "--latin"; do
+              if ! output=$(dotnet demo/ArabFaker.DatabaseDemo.dll --seed "$seed" $mode --db "$RUNNER_TEMP/sweep.db" 2>&1); then
+                echo "::error::seed $seed $mode failed"
+                echo "$output" | grep -E "FAIL|rejected|error" || echo "$output" | tail -n 15
+                failed="$failed $seed$mode"
+              fi
+            done
+          done
+          if [ -n "$failed" ]; then
+            echo "Failing seeds:$failed"
+            exit 1
+          fi
+          echo "All seeds from $from to $to passed in both languages."

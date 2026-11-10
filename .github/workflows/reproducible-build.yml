@@ -1,0 +1,56 @@
+name: Reproducible build
+
+# Builds the package twice on clean machines and compares the DLL hashes. If they differ, the build depends on
+# something other than the source (time, path, machine), and nobody could verify a release against the code.
+
+on:
+  pull_request:
+    paths:
+      - "ArabFaker.NET/**"
+      - "Directory.Build.*"
+      - ".github/workflows/reproducible-build.yml"
+  schedule:
+    - cron: "49 5 * * 3"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build ${{ matrix.run }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        run: [a, b]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Build
+        run: dotnet build ArabFaker.NET/ArabFaker.NET.csproj --configuration Release -p:ContinuousIntegrationBuild=true --output out
+      - name: Hash
+        run: |
+          sleep $((RANDOM % 5 + 1))
+          sha256sum out/ArabFaker.NET.dll > hash-${{ matrix.run }}.txt
+          cat hash-${{ matrix.run }}.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hash-${{ matrix.run }}
+          path: hash-${{ matrix.run }}.txt
+
+  compare:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: hashes
+          merge-multiple: true
+      - name: Compare
+        run: |
+          a=$(cut -d' ' -f1 hashes/hash-a.txt)
+          b=$(cut -d' ' -f1 hashes/hash-b.txt)
+          echo "a=$a"; echo "b=$b"
+          [ "$a" = "$b" ] || { echo "::error::The two builds are not byte-identical"; exit 1; }
