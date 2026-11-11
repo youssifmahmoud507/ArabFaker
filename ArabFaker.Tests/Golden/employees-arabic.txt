@@ -5,7 +5,7 @@
     "LastName": "عبدالله",
     "NationalId": "03436460056098",
     "Department": "الإدارة العليا",
-    "JobTitle": "مهندس سلامة",
+    "JobTitle": "نائب المدير العام",
     "BloodType": "B-",
     "Bank": "بنك الإسكندرية"
   },
@@ -15,7 +15,7 @@
     "LastName": "حميدة",
     "NationalId": "32894415828457",
     "Department": "المشتريات",
-    "JobTitle": "مسؤول مشتريات",
+    "JobTitle": "مفاوض عقود",
     "BloodType": "A+",
     "Bank": "بنك قطر الوطني مصر"
   },
@@ -25,7 +25,7 @@
     "LastName": "النجار",
     "NationalId": "05130978797108",
     "Department": "الشؤون القانونية",
-    "JobTitle": "فني تجميع",
+    "JobTitle": "محامي شركات",
     "BloodType": "B-",
     "Bank": "بنك المشرق"
   },
@@ -35,7 +35,7 @@
     "LastName": "مصطفى",
     "NationalId": "73493383976502",
     "Department": "النقل واللوجستيات",
-    "JobTitle": "موظف استقبال",
+    "JobTitle": "مشغل رافعة شوكية",
     "BloodType": "O+",
     "Bank": "بنك القاهرة"
   },
@@ -45,7 +45,7 @@
     "LastName": "الجندي",
     "NationalId": "10253191978079",
     "Department": "النقل واللوجستيات",
-    "JobTitle": "مدير مشروع",
+    "JobTitle": "سائق",
     "BloodType": "A+",
     "Bank": "بنك الكويت الوطني مصر"
   },
@@ -55,7 +55,7 @@
     "LastName": "موسى",
     "NationalId": "94980564318099",
     "Department": "التسويق",
-    "JobTitle": "مهندس بحث وتطوير",
+    "JobTitle": "مصمم جرافيك",
     "BloodType": "B-",
     "Bank": "المصرف المتحد"
   },
@@ -65,7 +65,7 @@
     "LastName": "محمد",
     "NationalId": "96803643833970",
     "Department": "العمليات",
-    "JobTitle": "أخصائي استقطاب",
+    "JobTitle": "منسق شحنات",
     "BloodType": "A+",
     "Bank": "بنك المؤسسة العربية المصرفية مصر"
   },
@@ -75,7 +75,7 @@
     "LastName": "معوض",
     "NationalId": "69804511599758",
     "Department": "الإنتاج",
-    "JobTitle": "محلل عمليات",
+    "JobTitle": "مهندس إنتاج",
     "BloodType": "A-",
     "Bank": "بنك الإسكندرية"
   },
@@ -85,7 +85,7 @@
     "LastName": "عامر",
     "NationalId": "44872246222740",
     "Department": "البحث والتطوير",
-    "JobTitle": "أمين مكتبة",
+    "JobTitle": "عالم بيانات",
     "BloodType": "O+",
     "Bank": "بنك المشرق"
   },
@@ -95,7 +95,7 @@
     "LastName": "حمدان",
     "NationalId": "73217365847802",
     "Department": "البحث والتطوير",
-    "JobTitle": "مسؤول أمن",
+    "JobTitle": "مهندس ذكاء اصطناعي",
     "BloodType": "B+",
     "Bank": "كريدي أجريكول مصر"
   },
@@ -105,7 +105,7 @@
     "LastName": "رضوان",
     "NationalId": "64986967873377",
     "Department": "الإعلام والاتصال",
-    "JobTitle": "مذيع",
+    "JobTitle": "منتج محتوى",
     "BloodType": "B-",
     "Bank": "بنك الإسكندرية"
   },
@@ -115,7 +115,7 @@
     "LastName": "خليل",
     "NationalId": "88079016665008",
     "Department": "الرعاية الصحية",
-    "JobTitle": "مراقب جودة",
+    "JobTitle": "ممرض",
     "BloodType": "A+",
     "Bank": "البنك التجاري الدولي"
   }
