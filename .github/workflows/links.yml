@@ -14,9 +14,9 @@ jobs:
     name: Check links in the documentation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: lycheeverse/lychee-action@v2
+      - uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2
         id: lychee
         with:
           args: --no-progress --accept 200,206,429 --exclude-loopback "./**/*.md"
@@ -24,7 +24,7 @@ jobs:
 
       - name: Open an issue when links are broken
         if: steps.lychee.outputs.exit_code != 0
-        uses: peter-evans/create-issue-from-file@v5
+        uses: peter-evans/create-issue-from-file@e8ef132d6df98ed982188e460ebb3b5d4ef3a9cd # v5
         with:
           title: Broken links in the documentation
           content-filepath: ./lychee/out.md
