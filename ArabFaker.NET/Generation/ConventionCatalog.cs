@@ -297,6 +297,84 @@ namespace ArabFaker.NET.Generation
             }
         }
 
+        /// <summary>
+        /// Chooses a factory for a property whose value must agree with another property of the same object:
+        /// a job title that belongs to the object's company department, or a course taught by its academic department.
+        /// </summary>
+        /// <remarks>
+        /// The factory reads the other property after the ordinary rules have run, so it also follows a department set by
+        /// an explicit rule. A department that is not in the built-in list falls back to an unrelated job title or course.
+        /// </remarks>
+        internal static bool TryCreateDependentFactory(
+            PropertyInfo property,
+            IReadOnlyList<PropertyInfo> siblings,
+            AutoFillOptions options,
+            [NotNullWhen(true)] out Func<object, FakerContext, object?>? factory)
+        {
+            factory = null;
+
+            if (property.PropertyType != typeof(string))
+                return false;
+
+            NameLanguage language = options.Language;
+            string key = Normalize(property.Name);
+            bool academic = IsAcademicType(property.DeclaringType);
+
+            if (key is "jobtitle" or "occupation")
+            {
+                PropertyInfo? department = academic ? null : FindString(siblings, "department", "departmentname");
+
+                if (department is null)
+                    return false;
+
+                factory = (instance, context) =>
+                {
+                    string value = department.GetValue(instance) as string ?? string.Empty;
+
+                    if (context.Reference.TryJobTitleInDepartment(value, out string title, language))
+                        return title;
+
+                    return context.Reference.TryJobTitle(out string any, language) ? any : string.Empty;
+                };
+
+                return true;
+            }
+
+            if (key is "course" or "coursename" or "coursetitle")
+            {
+                PropertyInfo? department = FindString(siblings, "academicdepartment", "academicdepartmentname")
+                    ?? (academic ? FindString(siblings, "department", "departmentname") : null);
+
+                if (department is null)
+                    return false;
+
+                factory = (instance, context) =>
+                {
+                    string value = department.GetValue(instance) as string ?? string.Empty;
+
+                    if (context.Reference.TryCourseInDepartment(value, out string course, language))
+                        return course;
+
+                    return context.Reference.TryCourse(out string any, language) ? any : string.Empty;
+                };
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private static PropertyInfo? FindString(IReadOnlyList<PropertyInfo> properties, params string[] keys)
+        {
+            foreach (PropertyInfo candidate in properties)
+            {
+                if (candidate.PropertyType == typeof(string) && candidate.CanRead && Array.IndexOf(keys, Normalize(candidate.Name)) >= 0)
+                    return candidate;
+            }
+
+            return null;
+        }
+
         private static bool IsAcademicType(Type? type)
         {
             if (type is null)
