@@ -295,23 +295,37 @@ namespace ArabFaker.NET.Generation
                 return this;
             }
 
-            var candidates = new List<(PropertyInfo Property, Action<T, FakerContext>? Apply)>();
+            var candidates = new List<(PropertyInfo Property, Action<T, FakerContext>? Apply, bool Dependent)>();
 
-            foreach (PropertyInfo property in typeof(T)
+            List<PropertyInfo> properties = typeof(T)
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(PropertySelectorAnalyzer.IsPubliclyWritable)
-                .OrderBy(candidate => candidate.Name, StringComparer.Ordinal))
+                .OrderBy(candidate => candidate.Name, StringComparer.Ordinal)
+                .ToList();
+
+            foreach (PropertyInfo property in properties)
             {
                 Action<T, FakerContext>? apply = null;
+                bool dependent = false;
 
                 if (ConventionCatalog.TryCreateFactory(property, options, out Func<FakerContext, object?>? factory))
                 {
                     Action<T, object?> setter = CompileObjectSetter(property);
 
-                    apply = (instance, context) => setter(instance, factory(context));
+                    // A job title or course that has to agree with the object's department is filled after the
+                    // ordinary rules, so it can read the department that was chosen.
+                    if (ConventionCatalog.TryCreateDependentFactory(property, properties, options, out Func<object, FakerContext, object?>? related))
+                    {
+                        apply = (instance, context) => setter(instance, related(instance!, context));
+                        dependent = true;
+                    }
+                    else
+                    {
+                        apply = (instance, context) => setter(instance, factory(context));
+                    }
                 }
 
-                candidates.Add((property, apply));
+                candidates.Add((property, apply, dependent));
             }
 
             lock (_syncRoot)
@@ -327,7 +341,7 @@ namespace ArabFaker.NET.Generation
 
                 var unmapped = new List<string>();
 
-                foreach ((PropertyInfo property, Action<T, FakerContext>? apply) in candidates)
+                foreach ((PropertyInfo property, Action<T, FakerContext>? apply, bool dependent) in candidates)
                 {
                     if (_ruleIndexes.ContainsKey(property.Name))
                         continue;
@@ -340,7 +354,7 @@ namespace ArabFaker.NET.Generation
                     }
 
                     _ruleIndexes[property.Name] = _rules.Count;
-                    _rules.Add(new PropertyRule(property.Name, apply, dependent: false));
+                    _rules.Add(new PropertyRule(property.Name, apply, dependent));
                 }
 
                 _unmappedProperties = unmapped.ToArray();

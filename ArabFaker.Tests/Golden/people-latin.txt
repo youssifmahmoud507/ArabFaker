@@ -1,0 +1,86 @@
+=== csv ===
+Id,FirstName,LastName,Email,BirthDate
+1,Mostafa,Abdullah,userujhc7l68@example.test,2000-06-14
+2,Sohair,Hamida,userblltsp5r@example.test,1971-06-29
+3,Fayrouz,Elnaggar,user30odk7np@example.test,1970-05-09
+4,Lujain,Mostafa,usercw3rmu1q@example.test,1975-08-27
+5,Said,Elgendy,user4o01xjlb@example.test,1992-04-07
+6,Moemen,Mousa,user7w3j1ub6@example.test,1985-05-14
+7,Essam,Mohamed,userqya65zbh@example.test,1986-05-29
+8,Salma,Moawad,user8czsgsze@example.test,1980-03-01
+9,Retaj,Amer,userj07gctsh@example.test,1967-03-25
+10,Said,Hamdan,userkoje850t@example.test,1972-04-07
+
+=== json ===
+[
+  {
+    "Id": 1,
+    "FirstName": "Mostafa",
+    "LastName": "Abdullah",
+    "Email": "userujhc7l68@example.test",
+    "BirthDate": "2000-06-14"
+  },
+  {
+    "Id": 2,
+    "FirstName": "Sohair",
+    "LastName": "Hamida",
+    "Email": "userblltsp5r@example.test",
+    "BirthDate": "1971-06-29"
+  },
+  {
+    "Id": 3,
+    "FirstName": "Fayrouz",
+    "LastName": "Elnaggar",
+    "Email": "user30odk7np@example.test",
+    "BirthDate": "1970-05-09"
+  },
+  {
+    "Id": 4,
+    "FirstName": "Lujain",
+    "LastName": "Mostafa",
+    "Email": "usercw3rmu1q@example.test",
+    "BirthDate": "1975-08-27"
+  },
+  {
+    "Id": 5,
+    "FirstName": "Said",
+    "LastName": "Elgendy",
+    "Email": "user4o01xjlb@example.test",
+    "BirthDate": "1992-04-07"
+  },
+  {
+    "Id": 6,
+    "FirstName": "Moemen",
+    "LastName": "Mousa",
+    "Email": "user7w3j1ub6@example.test",
+    "BirthDate": "1985-05-14"
+  },
+  {
+    "Id": 7,
+    "FirstName": "Essam",
+    "LastName": "Mohamed",
+    "Email": "userqya65zbh@example.test",
+    "BirthDate": "1986-05-29"
+  },
+  {
+    "Id": 8,
+    "FirstName": "Salma",
+    "LastName": "Moawad",
+    "Email": "user8czsgsze@example.test",
+    "BirthDate": "1980-03-01"
+  },
+  {
+    "Id": 9,
+    "FirstName": "Retaj",
+    "LastName": "Amer",
+    "Email": "userj07gctsh@example.test",
+    "BirthDate": "1967-03-25"
+  },
+  {
+    "Id": 10,
+    "FirstName": "Said",
+    "LastName": "Hamdan",
+    "Email": "userkoje850t@example.test",
+    "BirthDate": "1972-04-07"
+  }
+]

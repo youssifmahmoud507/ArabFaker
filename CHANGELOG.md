@@ -23,6 +23,14 @@ versions below `1.0.0` may change the public API.
   (time zones / globalization), mutation testing, link check and a code-quality report. Releases carry build provenance and an SBOM.
 - Export security tests: hostile text round-trips through a real SQLite database, JSON and CSV.
 
+### Changed
+
+- `AutoFill` keeps related values consistent: a `JobTitle` (or `Occupation`) is taken from the same object's `Department`,
+  and a `CourseName` from its `AcademicDepartment` (or from `Department` in an academic class). Before, the two were drawn
+  independently, so a legal-affairs employee could be an assembly technician. A department that is not in the built-in list,
+  or a missing department property, falls back to an unrelated value as before. **This changes the output of a seed for
+  classes that have both properties.**
+
 ### Testing
 
 - Golden-file tests pin the output of seed 2026 (people, employees with reference data, related tables in SQL Server and

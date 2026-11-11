@@ -120,11 +120,14 @@ var courses = faker.Define<Course>()
 c.Reference.TryCourseWithDepartment(out var course, out var department);
 c.Reference.TryJobTitleInDepartment("Finance", out var title, NameLanguage.Latin);
 
-// A value that must agree with another property of the same row (dependent rule):
+// AutoFill keeps a job title (or a course) consistent with the Department next to it:
+faker.Define<Employee>().AutoFill();                 // Department "Finance" -> JobTitle from Finance
+
+// For your own pairs, use a dependent rule (runs after every other rule):
 faker.Define<Employee>()
-    .AutoFill()                                      // fills Department
-    .RuleFor(x => x.JobTitle,                        // runs after every other rule
-        (x, c) => c.Reference.TryJobTitleInDepartment(x.Department, out var t) ? t : "");
+    .AutoFill()
+    .RuleFor(x => x.Level,
+        (x, c) => x.JobTitle.StartsWith("Senior") ? "Senior" : "Junior");
 
 c.Identifiers.GenerateNationalId();                  // 14 random digits, test data only
 ```

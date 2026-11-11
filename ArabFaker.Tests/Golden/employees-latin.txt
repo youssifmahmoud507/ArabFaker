@@ -1,0 +1,122 @@
+[
+  {
+    "Id": 1,
+    "FirstName": "Mostafa",
+    "LastName": "Abdullah",
+    "NationalId": "03436460056098",
+    "Department": "Executive Management",
+    "JobTitle": "Safety Engineer",
+    "BloodType": "B-",
+    "Bank": "Bank of Alexandria"
+  },
+  {
+    "Id": 2,
+    "FirstName": "Sohair",
+    "LastName": "Hamida",
+    "NationalId": "32894415828457",
+    "Department": "Procurement",
+    "JobTitle": "Procurement Officer",
+    "BloodType": "A+",
+    "Bank": "QNB Egypt"
+  },
+  {
+    "Id": 3,
+    "FirstName": "Fayrouz",
+    "LastName": "Elnaggar",
+    "NationalId": "05130978797108",
+    "Department": "Legal Affairs",
+    "JobTitle": "Assembly Technician",
+    "BloodType": "B-",
+    "Bank": "Mashreq Bank"
+  },
+  {
+    "Id": 4,
+    "FirstName": "Lujain",
+    "LastName": "Mostafa",
+    "NationalId": "73493383976502",
+    "Department": "Transportation and Logistics",
+    "JobTitle": "Receptionist",
+    "BloodType": "O+",
+    "Bank": "Banque du Caire"
+  },
+  {
+    "Id": 5,
+    "FirstName": "Said",
+    "LastName": "Elgendy",
+    "NationalId": "10253191978079",
+    "Department": "Transportation and Logistics",
+    "JobTitle": "Project Manager",
+    "BloodType": "A+",
+    "Bank": "National Bank of Kuwait Egypt"
+  },
+  {
+    "Id": 6,
+    "FirstName": "Moemen",
+    "LastName": "Mousa",
+    "NationalId": "94980564318099",
+    "Department": "Marketing",
+    "JobTitle": "R&D Engineer",
+    "BloodType": "B-",
+    "Bank": "United Bank"
+  },
+  {
+    "Id": 7,
+    "FirstName": "Essam",
+    "LastName": "Mohamed",
+    "NationalId": "96803643833970",
+    "Department": "Operations",
+    "JobTitle": "Talent Acquisition Specialist",
+    "BloodType": "A+",
+    "Bank": "Arab Banking Corporation Egypt"
+  },
+  {
+    "Id": 8,
+    "FirstName": "Salma",
+    "LastName": "Moawad",
+    "NationalId": "69804511599758",
+    "Department": "Production",
+    "JobTitle": "Operations Analyst",
+    "BloodType": "A-",
+    "Bank": "Bank of Alexandria"
+  },
+  {
+    "Id": 9,
+    "FirstName": "Retaj",
+    "LastName": "Amer",
+    "NationalId": "44872246222740",
+    "Department": "Research and Development",
+    "JobTitle": "Librarian",
+    "BloodType": "O+",
+    "Bank": "Mashreq Bank"
+  },
+  {
+    "Id": 10,
+    "FirstName": "Said",
+    "LastName": "Hamdan",
+    "NationalId": "73217365847802",
+    "Department": "Research and Development",
+    "JobTitle": "Security Officer",
+    "BloodType": "B+",
+    "Bank": "Crédit Agricole Egypt"
+  },
+  {
+    "Id": 11,
+    "FirstName": "Ramadan",
+    "LastName": "Radwan",
+    "NationalId": "64986967873377",
+    "Department": "Media and Communications",
+    "JobTitle": "Broadcaster",
+    "BloodType": "B-",
+    "Bank": "Bank of Alexandria"
+  },
+  {
+    "Id": 12,
+    "FirstName": "Moemen",
+    "LastName": "Khalil",
+    "NationalId": "88079016665008",
+    "Department": "Healthcare",
+    "JobTitle": "Quality Inspector",
+    "BloodType": "A+",
+    "Bank": "Commercial International Bank"
+  }
+]
