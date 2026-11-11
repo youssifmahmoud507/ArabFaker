@@ -31,6 +31,7 @@ versions below `1.0.0` may change the public API.
 
 ### Fixed
 
+- Every GitHub Action in the workflows is pinned to a full commit SHA (with the version in a comment), so a moved tag cannot change what runs in CI. Dependabot keeps the pins current.
 - OpenSSF Scorecard uses action v2.4.4, whose container comes from ghcr.io (v2.4.0 pulled from gcr.io, which now asks for billing).
 - Culture test no longer fails when globalization-invariant mode is on (it builds a German-style culture from the invariant one).
 - `.editorconfig` records why four analyzer rules are switched off for this library; `TryAnalyze` is static.
