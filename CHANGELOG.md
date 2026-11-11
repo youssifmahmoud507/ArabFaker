@@ -23,7 +23,16 @@ versions below `1.0.0` may change the public API.
   (time zones / globalization), mutation testing, link check and a code-quality report. Releases carry build provenance and an SBOM.
 - Export security tests: hostile text round-trips through a real SQLite database, JSON and CSV.
 
+### Documentation
+
+- XML `summary` comments on every internal type and on the remaining public members (random engine, seed derivation,
+  providers, reference catalogs, locations catalog), written from the code so they describe what each piece does.
+- Package description and tags now mention reference data, SQL dialects and determinism.
+
 ### Fixed
+
+- Culture test no longer fails when globalization-invariant mode is on (it builds a German-style culture from the invariant one).
+- `.editorconfig` records why four analyzer rules are switched off for this library; `TryAnalyze` is static.
 
 - SQL export wrote numbers inside quotes after the "never write unknown types raw" hardening; numeric types are written bare again.
 - Formatting and analyzer findings from the quality report (whitespace, `Enum.IsDefined<T>`, xUnit2012).

@@ -13,8 +13,8 @@
     <PackageId>ArabFaker.NET</PackageId>
     <Version>0.1.0-preview.1</Version>
     <Authors>Youssef Mahmoud</Authors>
-    <Description>Deterministic fake data for .NET with Arabic names and Egyptian administrative locations. Define generators for your own classes, generate related tables without orphan foreign keys, and export to JSON, CSV or SQL.</Description>
-    <PackageTags>fake-data;test-data;faker;arabic;egypt;seed;dataset;testing</PackageTags>
+    <Description>Deterministic fake data for .NET with Arabic names, Egyptian administrative locations and bilingual reference data (university courses, job titles, banks and more). Define generators for your own classes, generate related tables without orphan foreign keys, and export to JSON, CSV or SQL (Standard, SQL Server, MySQL). Same seed, same data, on every machine.</Description>
+    <PackageTags>fake-data;test-data;faker;arabic;egypt;seed;dataset;testing;seeding;sql;csv;json;deterministic</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/youssifmahmoud507/ArabFaker</PackageProjectUrl>

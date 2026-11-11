@@ -1,5 +1,9 @@
 ﻿namespace ArabFaker.NET.Providers.Arab.Reference
 {
+    /// <summary>
+    /// Commerce reference lists: product categories, payment methods, banks and currency codes.
+    /// The values are test data only; changing a list changes the output for the same seed.
+    /// </summary>
     internal static partial class ReferenceCatalog
     {
         /// <summary>Product categories of a general store.</summary>

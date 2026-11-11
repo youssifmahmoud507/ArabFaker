@@ -8,6 +8,10 @@ using ArabFaker.NET.Providers.Common.Text;
 
 namespace ArabFaker.NET.Generation
 {
+    /// <summary>
+    /// Everything a rule can use while one item is generated: the item index, the seed-derived
+    /// providers and the random stream for this item.
+    /// </summary>
     internal sealed class GenerationContext
     {
         private readonly RandomStreamFactory _streamFactory;

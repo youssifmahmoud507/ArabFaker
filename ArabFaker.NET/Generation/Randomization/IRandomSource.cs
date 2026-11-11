@@ -4,6 +4,9 @@ using System.Text;
 
 namespace ArabFaker.NET.Generation.Randomization
 {
+    /// <summary>
+    /// A source of raw random numbers. Kept behind an interface so the engine can be swapped or tested.
+    /// </summary>
     internal interface IRandomSource
     {
         ulong NextUInt64();

@@ -2,6 +2,9 @@
 
 namespace ArabFaker.NET.Providers.Arab.Names
 {
+    /// <summary>
+    /// Picks first names, family names and full names in Arabic or Latin script.
+    /// </summary>
     internal sealed class NamesProvider
     {
         private readonly RandomGenerator _random;

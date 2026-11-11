@@ -4,6 +4,9 @@ using System.Text;
 
 namespace ArabFaker.NET.Providers.Common.Text
 {
+    /// <summary>
+    /// The character sets random text can be drawn from.
+    /// </summary>
     internal enum TextCharacterSet
     {
         LowercaseLetters = 1,

@@ -2,6 +2,10 @@
 
 namespace ArabFaker.NET.Generation.Seed
 {
+    /// <summary>
+    /// Derives a stable sub-seed from the main seed, a scope key and an item index, so providers
+    /// never share a stream and adding one does not change the output of another.
+    /// </summary>
     internal static class SeedDeriver
     {
         private const ulong StreamDomain = 0x4152414246414B45UL;

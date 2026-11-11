@@ -8,7 +8,6 @@ namespace ArabFaker.NET.Providers.Common.Identifiers
     /// <summary>
     /// Provides methods for generating fake identifiers.
     /// </summary>
-
     public sealed class IdentifierGenerator
     {
         private readonly IdGenerator _provider;

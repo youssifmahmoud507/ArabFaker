@@ -5,6 +5,10 @@ using System.Text;
 
 namespace ArabFaker.NET.Generation
 {
+    /// <summary>
+    /// Produces digit strings and GUIDs from the
+    /// item's random stream, so the same seed always gives the same identifiers.
+    /// </summary>
     internal sealed class IdGenerator
     {
         private readonly IRandomSource _randomSource;

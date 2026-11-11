@@ -2,6 +2,10 @@
 
 namespace ArabFaker.NET.Generation.Randomization
 {
+    /// <summary>
+    /// The xoshiro256** generator: fast, high quality and fully deterministic for a given seed.
+    /// Not suitable for secrets; this library only generates test data.
+    /// </summary>
     internal sealed class Xoshiro256StarStarRandomSource : IRandomSource
     {
         private ulong _s0;
@@ -23,6 +27,9 @@ namespace ArabFaker.NET.Generation.Randomization
             }
         }
 
+        /// <summary>
+        /// Returns the next 64 random bits.
+        /// </summary>
         public ulong NextUInt64()
         {
             ulong result = unchecked(RotateLeft(unchecked(_s1 * 5), 7) * 9);
@@ -40,6 +47,9 @@ namespace ArabFaker.NET.Generation.Randomization
             return result;
         }
 
+        /// <summary>
+        /// Picks an integer in [minInclusive, maxExclusive) without modulo bias. Returns false for an empty or inverted range.
+        /// </summary>
         public bool TryNextInt32(int minInclusive, int maxExclusive, out int value)
         {
             value = default;
@@ -66,6 +76,9 @@ namespace ArabFaker.NET.Generation.Randomization
             return true;
         }
 
+        /// <summary>
+        /// Returns a double in [0, 1) using the top 53 bits.
+        /// </summary>
         public double NextDouble()
         {
             const double Scale = 1.0 / 9007199254740992.0;
@@ -73,6 +86,9 @@ namespace ArabFaker.NET.Generation.Randomization
             return (NextUInt64() >> 11) * Scale;
         }
 
+        /// <summary>
+        /// Fills the span with random bytes.
+        /// </summary>
         public void NextBytes(Span<byte> destination)
         {
             while (destination.Length >= sizeof(ulong))

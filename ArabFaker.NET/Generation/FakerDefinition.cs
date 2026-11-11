@@ -628,6 +628,10 @@ namespace ArabFaker.NET.Generation
             return Expression.Lambda<Action<T, TProperty>>(assignment, instance, value).Compile();
         }
 
+        /// <summary>
+        /// One configured rule: the property it fills, how to produce the value and whether it is a
+        /// dependent rule (runs after the ordinary rules and can read the finished object).
+        /// </summary>
         private sealed class PropertyRule
         {
             internal PropertyRule(string propertyName, Action<T, FakerContext> apply, bool dependent)

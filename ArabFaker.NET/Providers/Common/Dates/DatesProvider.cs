@@ -5,6 +5,9 @@ using System.Text;
 
 namespace ArabFaker.NET.Providers.Common.Dates
 {
+    /// <summary>
+    /// Generates dates, date-times and dates of birth inside a range, always from the seeded stream.
+    /// </summary>
     internal sealed class DatesProvider
     {
         private readonly RandomGenerator _random;

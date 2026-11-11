@@ -57,7 +57,12 @@ namespace ArabFaker.Tests.Export
 
             try
             {
-                CultureInfo.CurrentCulture = new CultureInfo("de-DE");
+                // A copy of the invariant culture with German number formatting. Unlike new CultureInfo("de-DE") it also
+                // works when globalization-invariant mode is on, where only the invariant culture exists.
+                var german = (CultureInfo)CultureInfo.InvariantCulture.Clone();
+                german.NumberFormat.NumberDecimalSeparator = ",";
+                german.NumberFormat.NumberGroupSeparator = ".";
+                CultureInfo.CurrentCulture = german;
 
                 var csv = RowExporter.ToCsv(new[] { Row() }).Value!;
 

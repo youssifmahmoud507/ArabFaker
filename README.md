@@ -1,7 +1,7 @@
 # ArabFaker.NET
 
 A .NET library for generating **fake / synthetic test data**, with first-class support
-for Arabic names and Egyptian administrative locations. You keep your own classes;
+for Arabic names, Egyptian administrative locations and bilingual reference data (courses, job titles, banks, ...). You keep your own classes;
 ArabFaker only gives you reproducible building blocks to fill them.
 
 > **Status: pre-release (`0.1.0-preview.1`).** Generators, `Generate*`, `AutoFill`, datasets with

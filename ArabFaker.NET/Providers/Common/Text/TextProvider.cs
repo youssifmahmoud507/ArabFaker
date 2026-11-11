@@ -2,6 +2,9 @@
 
 namespace ArabFaker.NET.Providers.Common.Text
 {
+    /// <summary>
+    /// Generates random strings of a given length from a chosen character set (digits, letters, hexadecimal, ...).
+    /// </summary>
     internal sealed class TextProvider
     {
         private static readonly char[] LowercaseCharacters = "abcdefghijklmnopqrstuvwxyz".ToCharArray();

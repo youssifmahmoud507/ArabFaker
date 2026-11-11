@@ -563,7 +563,7 @@ namespace ArabFaker.NET.Dataset
 
         // ---------- helpers ----------
 
-        private bool TryAnalyze<TProperty>(
+        private static bool TryAnalyze<TProperty>(
             Expression<Func<T, TProperty>> selector,
             [NotNullWhen(true)] out PropertyInfo? property,
             List<ConfigurationError> errors)
