@@ -3,6 +3,10 @@ using ArabFaker.NET.Providers.Arab.Names;
 
 namespace ArabFaker.NET.Providers.Arab.Reference
 {
+    /// <summary>
+    /// Picks entries from the reference catalogs (courses, job titles, banks, blood types, ...),
+    /// including coherent pairs such as a course with its department.
+    /// </summary>
     internal sealed class ReferenceProvider
     {
         private static readonly ReferenceEntry[] AllCourses = Flatten(ReferenceCatalog.AcademicDepartments);

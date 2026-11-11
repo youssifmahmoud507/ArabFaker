@@ -4,6 +4,9 @@ using System.Text;
 
 namespace ArabFaker.NET.Providers.Arab.Names
 {
+    /// <summary>
+    /// A name in Arabic script with its Latin spelling.
+    /// </summary>
     internal readonly record struct NameEntry(string Arabic, string Latin)
     {
         internal bool TryGetValue(NameLanguage language, out string value)

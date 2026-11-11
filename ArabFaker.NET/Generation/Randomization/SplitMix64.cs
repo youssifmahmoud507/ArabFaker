@@ -1,5 +1,8 @@
 ﻿namespace ArabFaker.NET.Generation.Randomization
 {
+    /// <summary>
+    /// The SplitMix64 mixing function. Used to spread a seed into well-distributed starting state.
+    /// </summary>
     internal static class SplitMix64
     {
         private const ulong GoldenRatio = 0x9E3779B97F4A7C15UL;

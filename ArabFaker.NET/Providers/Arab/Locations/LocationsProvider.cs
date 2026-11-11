@@ -2,6 +2,9 @@
 
 namespace ArabFaker.NET.Providers.Arab.Locations
 {
+    /// <summary>
+    /// Picks Egyptian governorates, districts and shiyakhat, keeping each child inside its real parent.
+    /// </summary>
     internal sealed class LocationsProvider
     {
         private readonly RandomGenerator _random;

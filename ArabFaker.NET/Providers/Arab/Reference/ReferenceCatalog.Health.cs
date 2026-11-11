@@ -1,5 +1,9 @@
 ﻿namespace ArabFaker.NET.Providers.Arab.Reference
 {
+    /// <summary>
+    /// Health reference lists: medical specialties and blood types.
+    /// The values are test data only; changing a list changes the output for the same seed.
+    /// </summary>
     internal static partial class ReferenceCatalog
     {
         /// <summary>Medical specialties.</summary>

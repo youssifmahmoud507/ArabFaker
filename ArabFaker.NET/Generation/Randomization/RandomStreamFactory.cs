@@ -2,6 +2,9 @@
 
 namespace ArabFaker.NET.Generation.Randomization
 {
+    /// <summary>
+    /// Creates independent, reproducible random streams, one per provider and item, from a single seed.
+    /// </summary>
     internal sealed class RandomStreamFactory
     {
         private readonly ulong _rootSeed;

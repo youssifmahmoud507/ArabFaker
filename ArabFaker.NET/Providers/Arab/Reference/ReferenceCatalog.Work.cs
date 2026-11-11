@@ -1,5 +1,9 @@
 ﻿namespace ArabFaker.NET.Providers.Arab.Reference
 {
+    /// <summary>
+    /// Work reference lists: company departments with their job titles.
+    /// The values are test data only; changing a list changes the output for the same seed.
+    /// </summary>
     internal static partial class ReferenceCatalog
     {
         /// <summary>Company departments, each with the job titles found in it.</summary>

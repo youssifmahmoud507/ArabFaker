@@ -37,6 +37,10 @@ namespace ArabFaker.NET.Dataset
         object GetRowsAsList();
     }
 
+    /// <summary>
+    /// Describes one foreign-key column: which property holds the key, which table it points to,
+    /// and whether it may be empty (optional).
+    /// </summary>
     internal sealed class ForeignKeyPlan
     {
         internal ForeignKeyPlan(
@@ -126,6 +130,9 @@ namespace ArabFaker.NET.Dataset
         internal Action<object, object?> Setter { get; }
     }
 
+    /// <summary>
+    /// A set of columns whose combined values must be unique across the rows of one table.
+    /// </summary>
     internal sealed class UniqueGroup
     {
         internal UniqueGroup(IReadOnlyList<ForeignKeyPlan> members)

@@ -1,5 +1,9 @@
 ﻿namespace ArabFaker.NET.Providers.Arab.Reference
 {
+    /// <summary>
+    /// General reference lists: marital statuses, countries, languages, colors, weekdays and months.
+    /// The values are test data only; changing a list changes the output for the same seed.
+    /// </summary>
     internal static partial class ReferenceCatalog
     {
         /// <summary>Marital statuses.</summary>

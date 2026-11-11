@@ -1,5 +1,9 @@
 ﻿namespace ArabFaker.NET.Providers.Arab.Reference
 {
+    /// <summary>
+    /// Academic reference lists: departments with their courses, faculties, universities, education levels and academic years.
+    /// The values are test data only; changing a list changes the output for the same seed.
+    /// </summary>
     internal static partial class ReferenceCatalog
     {
         /// <summary>Academic departments, each with the courses it teaches.</summary>

@@ -5,6 +5,9 @@ using System.Text;
 
 namespace ArabFaker.NET.Providers.Common.Internet
 {
+    /// <summary>
+    /// Generates test-only internet values: user names and email addresses (on a reserved test domain by default).
+    /// </summary>
     internal sealed class InternetProvider
     {
         private const string DefaultTestDomain = "example.test";

@@ -5,6 +5,9 @@ using System.Text.Json.Serialization;
 
 namespace ArabFaker.NET.Providers.Arab.Locations
 {
+    /// <summary>
+    /// The locations catalog, loaded once from the embedded JSON files and indexed by level and parent.
+    /// </summary>
     internal sealed class LocationCatalog
     {
         private const string ResourcePrefix = "ArabFaker.Data.Locations.Egypt.";
@@ -228,44 +231,83 @@ namespace ArabFaker.NET.Providers.Arab.Locations
             return true;
         }
 
+        /// <summary>
+        /// One record of the embedded locations JSON.
+        /// </summary>
         private sealed class DatasetRecord
         {
+            /// <summary>
+            /// The record id.
+            /// </summary>
             [JsonPropertyName("id")]
             public string? Id { get; set; }
 
+            /// <summary>
+            /// The administrative level (1 governorate, 2 district, 3 shiyakha).
+            /// </summary>
             [JsonPropertyName("level")]
             public int Level { get; set; }
 
+            /// <summary>
+            /// The names of the place.
+            /// </summary>
             [JsonPropertyName("name")]
             public DatasetName? Name { get; set; }
 
+            /// <summary>
+            /// The parent place, if any.
+            /// </summary>
             [JsonPropertyName("parent")]
             public DatasetParent? Parent { get; set; }
 
+            /// <summary>
+            /// The coordinates, if known.
+            /// </summary>
             [JsonPropertyName("geo")]
             public DatasetGeo? Geo { get; set; }
         }
 
+        /// <summary>
+        /// The Arabic and English names of a location record.
+        /// </summary>
         private sealed class DatasetName
         {
+            /// <summary>
+            /// The Arabic name.
+            /// </summary>
             [JsonPropertyName("local")]
             public string? Local { get; set; }
 
+            /// <summary>
+            /// The English name.
+            /// </summary>
             [JsonPropertyName("en")]
             public string? En { get; set; }
         }
 
+        /// <summary>
+        /// The parent reference of a location record.
+        /// </summary>
         private sealed class DatasetParent
         {
             [JsonPropertyName("id")]
             public string? Id { get; set; }
         }
 
+        /// <summary>
+        /// The coordinates of a location record, as text.
+        /// </summary>
         private sealed class DatasetGeo
         {
+            /// <summary>
+            /// The latitude.
+            /// </summary>
             [JsonPropertyName("lat")]
             public string? Lat { get; set; }
 
+            /// <summary>
+            /// The longitude.
+            /// </summary>
             [JsonPropertyName("lon")]
             public string? Lon { get; set; }
         }

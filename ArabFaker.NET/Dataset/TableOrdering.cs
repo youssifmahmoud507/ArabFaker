@@ -1,5 +1,9 @@
 namespace ArabFaker.NET.Dataset
 {
+    /// <summary>
+    /// Orders dataset tables so a parent table always comes before the tables that reference it
+    /// (used by the SQL export so INSERT scripts never break a foreign key).
+    /// </summary>
     internal static class TableOrdering
     {
         /// <summary>

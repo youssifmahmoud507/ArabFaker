@@ -1,5 +1,9 @@
 ﻿﻿namespace ArabFaker.NET.Generation.Randomization
 {
+    /// <summary>
+    /// Turns a raw random source into the values the providers need (ranges, picks, probabilities).
+    /// Every method reports bad arguments by returning false instead of throwing.
+    /// </summary>
     internal sealed class RandomGenerator
     {
         private readonly IRandomSource _randomSource;
@@ -9,11 +13,17 @@
             _randomSource = randomSource;
         }
 
+        /// <summary>
+        /// Picks an integer in [minInclusive, maxExclusive). Returns false for an empty or inverted range.
+        /// </summary>
         public bool TryNextInt(int minInclusive, int maxExclusive, out int value)
         {
             return _randomSource.TryNextInt32(minInclusive, maxExclusive, out value);
         }
 
+        /// <summary>
+        /// Picks a decimal in [minInclusive, maxInclusive] rounded to the given decimal places (0 to 28). Returns false for an inverted range or bad decimal places.
+        /// </summary>
         public bool TryNextDecimal(decimal minInclusive, decimal maxInclusive, out decimal value, int decimalPlaces = 2)
         {
             value = default;
@@ -59,11 +69,17 @@
             return true;
         }
 
+        /// <summary>
+        /// Returns a double in [0, 1).
+        /// </summary>
         public double NextDouble()
         {
             return _randomSource.NextDouble();
         }
 
+        /// <summary>
+        /// Returns true with the given probability (0 to 1). Returns false when the probability is outside that range.
+        /// </summary>
         public bool TryNextBoolean(double trueProbability, out bool value)
         {
             value = false;
@@ -78,6 +94,9 @@
             return true;
         }
 
+        /// <summary>
+        /// Picks one item. Returns false when the list is null or empty.
+        /// </summary>
         public bool TryPick<T>(IReadOnlyList<T>? items, out T value)
         {
             value = default!;
@@ -95,6 +114,10 @@
             return true;
         }
 
+        /// <summary>
+        /// Picks several items, with or without duplicates. Returns false for a null list, a negative count, an empty list with a positive count,
+        /// or a count larger than the list when duplicates are not allowed.
+        /// </summary>
         public bool TryPickMany<T>(IReadOnlyList<T>? items, int count, bool allowDuplicates, out T[] selected)
         {
             selected = [];
