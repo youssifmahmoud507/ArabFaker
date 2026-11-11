@@ -1,0 +1,260 @@
+type ArabFaker.NET.Dataset.DatasetBuilder
+  ArabFaker.NET.Dataset.DatasetTable<T, TKey> Table<T, TKey>(ArabFaker.NET.Generation.FakerDefinition<T> definition, System.Int32 rowCount, System.Linq.Expressions.Expression<System.Func<T, TKey>> keySelector)
+  ArabFaker.NET.Generation.GenerationResult<ArabFaker.NET.Dataset.GeneratedDataset> Build()
+  System.Boolean IsValid { get; }
+  System.Collections.Generic.IReadOnlyList<ArabFaker.NET.Generation.ConfigurationError> ConfigurationErrors { get; }
+type ArabFaker.NET.Dataset.DatasetTable<T, TKey> : ArabFaker.NET.Dataset.ITableRuntime
+  ArabFaker.NET.Dataset.DatasetTable<T, TKey> Collection<TCollection, TChild, TChildKey, TForeignKey>(System.Linq.Expressions.Expression<System.Func<T, TCollection>> collectionSelector, ArabFaker.NET.Dataset.DatasetTable<TChild, TChildKey> child, System.Linq.Expressions.Expression<System.Func<TChild, TForeignKey>> childForeignKey)
+  ArabFaker.NET.Dataset.DatasetTable<T, TKey> ForeignKey<TProperty, TParent, TParentKey>(System.Linq.Expressions.Expression<System.Func<T, TProperty>> propertySelector, ArabFaker.NET.Dataset.DatasetTable<TParent, TParentKey> parent, System.Double nullChance = 0)
+  ArabFaker.NET.Dataset.DatasetTable<T, TKey> Navigation<TForeignKey, TNavigation>(System.Linq.Expressions.Expression<System.Func<T, TForeignKey>> foreignKey, System.Linq.Expressions.Expression<System.Func<T, TNavigation>> navigation)
+  ArabFaker.NET.Dataset.DatasetTable<T, TKey> SelfReference<TProperty>(System.Linq.Expressions.Expression<System.Func<T, TProperty>> propertySelector, System.Int32 roots = 1)
+  ArabFaker.NET.Dataset.DatasetTable<T, TKey> UniqueTogether<TFirst, TSecond, TThird>(System.Linq.Expressions.Expression<System.Func<T, TFirst>> first, System.Linq.Expressions.Expression<System.Func<T, TSecond>> second, System.Linq.Expressions.Expression<System.Func<T, TThird>> third)
+  ArabFaker.NET.Dataset.DatasetTable<T, TKey> UniqueTogether<TFirst, TSecond>(System.Linq.Expressions.Expression<System.Func<T, TFirst>> first, System.Linq.Expressions.Expression<System.Func<T, TSecond>> second)
+  System.Int32 RowCount { get; }
+type ArabFaker.NET.Dataset.GeneratedDataset
+  ArabFaker.NET.Generation.GenerationResult<System.String> ToJson(ArabFaker.NET.Export.JsonExportOptions options = )
+  ArabFaker.NET.Generation.GenerationResult<System.String> ToSql(ArabFaker.NET.Export.SqlExportOptions options = )
+  System.Collections.Generic.IReadOnlyList<T> Rows<T, TKey>(ArabFaker.NET.Dataset.DatasetTable<T, TKey> table)
+type ArabFaker.NET.Export.CsvExportOptions
+  System.Boolean NeutralizeFormulas { get; set; }
+  ctor()
+type ArabFaker.NET.Export.JsonExportOptions
+  System.Boolean CamelCase { get; set; }
+  System.Boolean Indented { get; set; }
+  ctor()
+type ArabFaker.NET.Export.RowExporter
+  static ArabFaker.NET.Generation.GenerationResult<System.String> ToCsv<T>(System.Collections.Generic.IEnumerable<T> rows, ArabFaker.NET.Export.CsvExportOptions options = )
+  static ArabFaker.NET.Generation.GenerationResult<System.String> ToJson<T>(System.Collections.Generic.IEnumerable<T> rows, ArabFaker.NET.Export.JsonExportOptions options = )
+  static ArabFaker.NET.Generation.GenerationResult<System.String> ToSql<T>(System.Collections.Generic.IEnumerable<T> rows, ArabFaker.NET.Export.SqlExportOptions options = )
+type ArabFaker.NET.Export.SqlDialect : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  System.Int32 value__
+  const ArabFaker.NET.Export.SqlDialect MySql
+  const ArabFaker.NET.Export.SqlDialect SqlServer
+  const ArabFaker.NET.Export.SqlDialect Standard
+type ArabFaker.NET.Export.SqlExportOptions
+  ArabFaker.NET.Export.SqlDialect Dialect { get; set; }
+  System.Boolean EnumsAsText { get; set; }
+  System.String TableName { get; set; }
+  ctor()
+type ArabFaker.NET.Faker
+  ArabFaker.NET.Dataset.DatasetBuilder CreateDataset()
+  ArabFaker.NET.Generation.FakerDefinition<T> Define<T>()
+  ArabFaker.NET.Generation.FakerDefinition<T> Define<T>(System.Func<T> factory)
+  System.Int64 Seed { get; }
+  ctor()
+  ctor(System.Int64 seed)
+type ArabFaker.NET.Generation.AutoFillOptions
+  ArabFaker.NET.Providers.Arab.Names.NameLanguage Language { get; set; }
+  System.DateOnly ReferenceDate { get; set; }
+  System.Int32 MaxAge { get; set; }
+  System.Int32 MinAge { get; set; }
+  ctor()
+type ArabFaker.NET.Generation.ConfigurationError : System.IEquatable<ArabFaker.NET.Generation.ConfigurationError>
+  ArabFaker.NET.Generation.ConfigurationError <Clone>$()
+  System.Boolean Equals(ArabFaker.NET.Generation.ConfigurationError other)
+  System.Boolean Equals(System.Object obj)
+  System.Int32 GetHashCode()
+  System.String Code { get; set; }
+  System.String Message { get; set; }
+  System.String ToString()
+  System.Void Deconstruct(out System.String Code, out System.String Message)
+  ctor(System.String Code, System.String Message)
+type ArabFaker.NET.Generation.ConfigurationErrorCodes
+  const System.String DefinitionFrozen
+  const System.String DefinitionIdExhausted
+  const System.String DuplicateTable
+  const System.String FieldNotSupported
+  const System.String ForeignKeyNotNullable
+  const System.String ForeignKeyPropertyConflict
+  const System.String ForeignKeyTargetInvalid
+  const System.String ForeignKeyTypeMismatch
+  const System.String IndexerNotSupported
+  const System.String InitOnlyPropertyNotSupported
+  const System.String InvalidAutoFillOptions
+  const System.String InvalidNullChance
+  const System.String InvalidRoots
+  const System.String InvalidRowCount
+  const System.String InvalidUniqueGroup
+  const System.String NavigationForeignKeyMissing
+  const System.String NavigationPropertyConflict
+  const System.String NavigationTargetInvalid
+  const System.String NavigationTypeMismatch
+  const System.String NestedPropertyNotSupported
+  const System.String NullDefinition
+  const System.String NullFactory
+  const System.String NullPropertySelector
+  const System.String NullValueFactory
+  const System.String PropertyNotWritable
+  const System.String PropertyTypeMismatch
+  const System.String StaticMemberNotSupported
+  const System.String UnsupportedSelector
+type ArabFaker.NET.Generation.FakerContext
+  ArabFaker.NET.Providers.Arab.Locations.LocationsGenerator Locations { get; }
+  ArabFaker.NET.Providers.Arab.Names.NameGenerator Names { get; }
+  ArabFaker.NET.Providers.Arab.Reference.ReferenceGenerator Reference { get; }
+  ArabFaker.NET.Providers.Common.Dates.DatesGenerator Dates { get; }
+  ArabFaker.NET.Providers.Common.Identifiers.IdentifierGenerator Identifiers { get; }
+  ArabFaker.NET.Providers.Common.Internet.InternetGenerator Internet { get; }
+  ArabFaker.NET.Providers.Common.Random.RandomDataGenerator RandomData { get; }
+  ArabFaker.NET.Providers.Common.Text.TextGenerator Text { get; }
+  System.UInt64 ItemIndex { get; }
+type ArabFaker.NET.Generation.FakerDefinition<T>
+  ArabFaker.NET.Generation.FakerDefinition<T> AutoFill()
+  ArabFaker.NET.Generation.FakerDefinition<T> AutoFill(ArabFaker.NET.Generation.AutoFillOptions options)
+  ArabFaker.NET.Generation.FakerDefinition<T> Freeze()
+  ArabFaker.NET.Generation.FakerDefinition<T> RuleFor<TProperty>(System.Linq.Expressions.Expression<System.Func<T, TProperty>> propertySelector, System.Func<ArabFaker.NET.Generation.FakerContext, TProperty> valueFactory)
+  ArabFaker.NET.Generation.FakerDefinition<T> RuleFor<TProperty>(System.Linq.Expressions.Expression<System.Func<T, TProperty>> propertySelector, System.Func<T, ArabFaker.NET.Generation.FakerContext, TProperty> valueFactory)
+  ArabFaker.NET.Generation.GenerationResult<System.Collections.Generic.IReadOnlyList<T>> Generate(System.Int32 count)
+  ArabFaker.NET.Generation.GenerationResult<T> Generate()
+  System.Boolean IsFrozen { get; }
+  System.Boolean IsValid { get; }
+  System.Collections.Generic.IEnumerable<ArabFaker.NET.Generation.GenerationResult<T>> GenerateLazy(System.Int32 count)
+  System.Collections.Generic.IReadOnlyList<ArabFaker.NET.Generation.ConfigurationError> ConfigurationErrors { get; }
+  System.Collections.Generic.IReadOnlyList<System.String> UnmappedProperties { get; }
+  System.Int32 RuleCount { get; }
+type ArabFaker.NET.Generation.GenerationError : System.IEquatable<ArabFaker.NET.Generation.GenerationError>
+  ArabFaker.NET.Generation.GenerationError <Clone>$()
+  System.Boolean Equals(ArabFaker.NET.Generation.GenerationError other)
+  System.Boolean Equals(System.Object obj)
+  System.Int32 GetHashCode()
+  System.String Code { get; set; }
+  System.String Message { get; set; }
+  System.String ToString()
+  System.Void Deconstruct(out System.String Code, out System.String Message)
+  ctor(System.String Code, System.String Message)
+type ArabFaker.NET.Generation.GenerationErrorCodes
+  const System.String DuplicateKey
+  const System.String DuplicateTableName
+  const System.String EmptyParentTable
+  const System.String FactoryReturnedNull
+  const System.String InvalidCount
+  const System.String InvalidDefinition
+  const System.String InvalidExportOptions
+  const System.String ItemIndexExhausted
+  const System.String NoExportableColumns
+  const System.String NullKey
+  const System.String NullRow
+  const System.String NullRows
+  const System.String UniqueConstraintUnsatisfiable
+type ArabFaker.NET.Generation.GenerationResult<T>
+  System.Boolean IsSuccess { get; }
+  System.Collections.Generic.IReadOnlyList<ArabFaker.NET.Generation.GenerationError> Errors { get; }
+  T Value { get; }
+type ArabFaker.NET.Providers.Arab.Locations.LocationInfo : System.IEquatable<ArabFaker.NET.Providers.Arab.Locations.LocationInfo>
+  ArabFaker.NET.Providers.Arab.Locations.LocationInfo <Clone>$()
+  ArabFaker.NET.Providers.Arab.Locations.LocationLevel Level { get; }
+  System.Boolean Equals(ArabFaker.NET.Providers.Arab.Locations.LocationInfo other)
+  System.Boolean Equals(System.Object obj)
+  System.Int32 GetHashCode()
+  System.Nullable<System.Double> Latitude { get; }
+  System.Nullable<System.Double> Longitude { get; }
+  System.String ArabicName { get; }
+  System.String EnglishName { get; }
+  System.String Id { get; }
+  System.String ParentId { get; }
+  System.String ToString()
+type ArabFaker.NET.Providers.Arab.Locations.LocationLanguage : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  System.Int32 value__
+  const ArabFaker.NET.Providers.Arab.Locations.LocationLanguage Arabic
+  const ArabFaker.NET.Providers.Arab.Locations.LocationLanguage English
+type ArabFaker.NET.Providers.Arab.Locations.LocationLevel : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  System.Int32 value__
+  const ArabFaker.NET.Providers.Arab.Locations.LocationLevel District
+  const ArabFaker.NET.Providers.Arab.Locations.LocationLevel Governorate
+  const ArabFaker.NET.Providers.Arab.Locations.LocationLevel Shiyakha
+type ArabFaker.NET.Providers.Arab.Locations.LocationsGenerator
+  System.Boolean TryDistrict(System.String governorateId, out ArabFaker.NET.Providers.Arab.Locations.LocationInfo location)
+  System.Boolean TryGovernorate(out ArabFaker.NET.Providers.Arab.Locations.LocationInfo location)
+  System.Boolean TryPick(ArabFaker.NET.Providers.Arab.Locations.LocationLevel level, out ArabFaker.NET.Providers.Arab.Locations.LocationInfo location)
+  System.Boolean TryPickName(ArabFaker.NET.Providers.Arab.Locations.LocationLevel level, ArabFaker.NET.Providers.Arab.Locations.LocationLanguage language, out System.String name)
+  System.Boolean TryShiyakha(System.String districtId, out ArabFaker.NET.Providers.Arab.Locations.LocationInfo location)
+type ArabFaker.NET.Providers.Arab.Names.NameGender : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  System.Int32 value__
+  const ArabFaker.NET.Providers.Arab.Names.NameGender Any
+  const ArabFaker.NET.Providers.Arab.Names.NameGender Female
+  const ArabFaker.NET.Providers.Arab.Names.NameGender Male
+type ArabFaker.NET.Providers.Arab.Names.NameGenerator
+  System.Boolean TryFirstName(out System.String name, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic, ArabFaker.NET.Providers.Arab.Names.NameGender gender = Any)
+  System.Boolean TryFullName(out System.String name, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic, ArabFaker.NET.Providers.Arab.Names.NameGender gender = Any)
+  System.Boolean TryLastName(out System.String name, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryMiddleName(out System.String name, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic, ArabFaker.NET.Providers.Arab.Names.NameGender gender = Any)
+type ArabFaker.NET.Providers.Arab.Names.NameLanguage : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  System.Int32 value__
+  const ArabFaker.NET.Providers.Arab.Names.NameLanguage Arabic
+  const ArabFaker.NET.Providers.Arab.Names.NameLanguage Latin
+type ArabFaker.NET.Providers.Arab.Reference.ReferenceGenerator
+  System.Boolean TryAcademicDepartment(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryAcademicYear(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryAnimal(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryBank(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryBloodType(out System.String value)
+  System.Boolean TryCarBrand(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryClothingSize(out System.String value)
+  System.Boolean TryColor(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryContinent(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryCopticMonth(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryCountry(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryCourse(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryCourseInDepartment(System.String department, out System.String course, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryCourseWithDepartment(out System.String course, out System.String department, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryCurrencyCode(out System.String value)
+  System.Boolean TryDayName(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryDepartment(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryEducationLevel(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryEgyptianDish(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryFaculty(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryFamilyRelation(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryFruit(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryGender(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryGradeRating(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryHijriMonth(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryHobby(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryIndustry(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryJobTitle(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryJobTitleInDepartment(System.String department, out System.String jobTitle, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryJobTitleWithDepartment(out System.String jobTitle, out System.String department, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryLanguage(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryMaritalStatus(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryMedicalSpecialty(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryMonthName(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryNationality(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryOperatingSystem(out System.String value)
+  System.Boolean TryPaymentMethod(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryPlanet(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryPriority(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryProductCategory(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryProgrammingLanguage(out System.String value)
+  System.Boolean TrySchoolStage(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TrySchoolSubject(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TrySeason(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TrySport(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryTouristAttraction(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryUniversity(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryVegetable(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+  System.Boolean TryZodiacSign(out System.String value, ArabFaker.NET.Providers.Arab.Names.NameLanguage language = Arabic)
+type ArabFaker.NET.Providers.Common.Dates.DatesGenerator
+  System.Boolean TryDateOfBirth(System.DateOnly asOfDate, System.Int32 minAge, System.Int32 maxAge, out System.DateOnly dateOfBirth)
+  System.Boolean TryDateOnlyBetween(System.DateOnly startInclusive, System.DateOnly endInclusive, out System.DateOnly value)
+  System.Boolean TryDateTimeBetween(System.DateTime startInclusive, System.DateTime endInclusive, out System.DateTime value)
+type ArabFaker.NET.Providers.Common.Identifiers.IdentifierGenerator
+  System.Guid GenerateGuid()
+  System.String GenerateGuidString()
+  System.String GenerateNationalId()
+type ArabFaker.NET.Providers.Common.Internet.InternetGenerator
+  System.Boolean TryEmail(out System.String email, System.String domain = example.test)
+  System.Boolean TryUsername(out System.String username)
+type ArabFaker.NET.Providers.Common.Random.RandomDataGenerator
+  System.Boolean TryBoolean(System.Double trueProbability, out System.Boolean value)
+  System.Boolean TryDecimal(System.Decimal minInclusive, System.Decimal maxInclusive, System.Int32 decimalPlaces, out System.Decimal value)
+  System.Boolean TryInt(System.Int32 minInclusive, System.Int32 maxExclusive, out System.Int32 value)
+  System.Boolean TryInt64(System.Int64 minInclusive, System.Int64 maxExclusive, out System.Int64 value)
+  System.Boolean TryPick<T>(System.Collections.Generic.IReadOnlyList<T> items, out T value)
+  System.Boolean TryPickMany<T>(System.Collections.Generic.IReadOnlyList<T> items, System.Int32 count, System.Boolean allowDuplicates, out T[] values)
+  System.Double NextDouble()
+type ArabFaker.NET.Providers.Common.Text.TextGenerator
+  System.Boolean TryAlphaNumeric(System.Int32 length, out System.String value)
+  System.Boolean TryDigits(System.Int32 length, out System.String value)
+  System.Boolean TryHexadecimal(System.Int32 length, out System.String value)
+  System.Boolean TryLetters(System.Int32 length, out System.String value)
+  System.Boolean TryLowercaseLetters(System.Int32 length, out System.String value)
+  System.Boolean TryUppercaseLetters(System.Int32 length, out System.String value)

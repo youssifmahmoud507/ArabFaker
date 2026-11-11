@@ -1,0 +1,203 @@
+=== json ===
+{
+  "GoldenStudent": [
+    {
+      "Id": 1,
+      "FirstName": "مصطفى",
+      "LastName": "عبدالله"
+    },
+    {
+      "Id": 2,
+      "FirstName": "سهير",
+      "LastName": "حميدة"
+    },
+    {
+      "Id": 3,
+      "FirstName": "فيروز",
+      "LastName": "النجار"
+    },
+    {
+      "Id": 4,
+      "FirstName": "لجين",
+      "LastName": "مصطفى"
+    },
+    {
+      "Id": 5,
+      "FirstName": "سعيد",
+      "LastName": "الجندي"
+    },
+    {
+      "Id": 6,
+      "FirstName": "مؤمن",
+      "LastName": "موسى"
+    },
+    {
+      "Id": 7,
+      "FirstName": "عصام",
+      "LastName": "محمد"
+    },
+    {
+      "Id": 8,
+      "FirstName": "سلمى",
+      "LastName": "معوض"
+    }
+  ],
+  "GoldenCourse": [
+    {
+      "Id": 1,
+      "Title": "تنظيم الرحلات"
+    },
+    {
+      "Id": 2,
+      "Title": "اقتصاديات العمل"
+    },
+    {
+      "Id": 3,
+      "Title": "علم السموم"
+    },
+    {
+      "Id": 4,
+      "Title": "فيزياء الحالة الصلبة"
+    },
+    {
+      "Id": 5,
+      "Title": "علم الأمراض"
+    }
+  ],
+  "GoldenEnrollment": [
+    {
+      "Id": 1,
+      "StudentId": 7,
+      "CourseId": 1
+    },
+    {
+      "Id": 2,
+      "StudentId": 4,
+      "CourseId": 5
+    },
+    {
+      "Id": 3,
+      "StudentId": 2,
+      "CourseId": 4
+    },
+    {
+      "Id": 4,
+      "StudentId": 1,
+      "CourseId": 4
+    },
+    {
+      "Id": 5,
+      "StudentId": 1,
+      "CourseId": 2
+    },
+    {
+      "Id": 6,
+      "StudentId": 6,
+      "CourseId": 5
+    },
+    {
+      "Id": 7,
+      "StudentId": 5,
+      "CourseId": 5
+    },
+    {
+      "Id": 8,
+      "StudentId": 8,
+      "CourseId": 4
+    },
+    {
+      "Id": 9,
+      "StudentId": 4,
+      "CourseId": 1
+    },
+    {
+      "Id": 10,
+      "StudentId": 5,
+      "CourseId": 3
+    },
+    {
+      "Id": 11,
+      "StudentId": 4,
+      "CourseId": 4
+    },
+    {
+      "Id": 12,
+      "StudentId": 3,
+      "CourseId": 5
+    },
+    {
+      "Id": 13,
+      "StudentId": 8,
+      "CourseId": 1
+    },
+    {
+      "Id": 14,
+      "StudentId": 1,
+      "CourseId": 1
+    },
+    {
+      "Id": 15,
+      "StudentId": 8,
+      "CourseId": 3
+    },
+    {
+      "Id": 16,
+      "StudentId": 5,
+      "CourseId": 4
+    },
+    {
+      "Id": 17,
+      "StudentId": 4,
+      "CourseId": 3
+    },
+    {
+      "Id": 18,
+      "StudentId": 3,
+      "CourseId": 2
+    },
+    {
+      "Id": 19,
+      "StudentId": 8,
+      "CourseId": 5
+    },
+    {
+      "Id": 20,
+      "StudentId": 6,
+      "CourseId": 3
+    }
+  ]
+}
+=== sql ===
+INSERT INTO [GoldenStudent] ([Id], [FirstName], [LastName]) VALUES (1, N'مصطفى', N'عبدالله');
+INSERT INTO [GoldenStudent] ([Id], [FirstName], [LastName]) VALUES (2, N'سهير', N'حميدة');
+INSERT INTO [GoldenStudent] ([Id], [FirstName], [LastName]) VALUES (3, N'فيروز', N'النجار');
+INSERT INTO [GoldenStudent] ([Id], [FirstName], [LastName]) VALUES (4, N'لجين', N'مصطفى');
+INSERT INTO [GoldenStudent] ([Id], [FirstName], [LastName]) VALUES (5, N'سعيد', N'الجندي');
+INSERT INTO [GoldenStudent] ([Id], [FirstName], [LastName]) VALUES (6, N'مؤمن', N'موسى');
+INSERT INTO [GoldenStudent] ([Id], [FirstName], [LastName]) VALUES (7, N'عصام', N'محمد');
+INSERT INTO [GoldenStudent] ([Id], [FirstName], [LastName]) VALUES (8, N'سلمى', N'معوض');
+INSERT INTO [GoldenCourse] ([Id], [Title]) VALUES (1, N'تنظيم الرحلات');
+INSERT INTO [GoldenCourse] ([Id], [Title]) VALUES (2, N'اقتصاديات العمل');
+INSERT INTO [GoldenCourse] ([Id], [Title]) VALUES (3, N'علم السموم');
+INSERT INTO [GoldenCourse] ([Id], [Title]) VALUES (4, N'فيزياء الحالة الصلبة');
+INSERT INTO [GoldenCourse] ([Id], [Title]) VALUES (5, N'علم الأمراض');
+INSERT INTO [GoldenEnrollment] ([Id], [StudentId], [CourseId]) VALUES (1, 7, 1);
+INSERT INTO [GoldenEnrollment] ([Id], [StudentId], [CourseId]) VALUES (2, 4, 5);
+INSERT INTO [GoldenEnrollment] ([Id], [StudentId], [CourseId]) VALUES (3, 2, 4);
+INSERT INTO [GoldenEnrollment] ([Id], [StudentId], [CourseId]) VALUES (4, 1, 4);
+INSERT INTO [GoldenEnrollment] ([Id], [StudentId], [CourseId]) VALUES (5, 1, 2);
+INSERT INTO [GoldenEnrollment] ([Id], [StudentId], [CourseId]) VALUES (6, 6, 5);
+INSERT INTO [GoldenEnrollment] ([Id], [StudentId], [CourseId]) VALUES (7, 5, 5);
+INSERT INTO [GoldenEnrollment] ([Id], [StudentId], [CourseId]) VALUES (8, 8, 4);
+INSERT INTO [GoldenEnrollment] ([Id], [StudentId], [CourseId]) VALUES (9, 4, 1);
+INSERT INTO [GoldenEnrollment] ([Id], [StudentId], [CourseId]) VALUES (10, 5, 3);
+INSERT INTO [GoldenEnrollment] ([Id], [StudentId], [CourseId]) VALUES (11, 4, 4);
+INSERT INTO [GoldenEnrollment] ([Id], [StudentId], [CourseId]) VALUES (12, 3, 5);
+INSERT INTO [GoldenEnrollment] ([Id], [StudentId], [CourseId]) VALUES (13, 8, 1);
+INSERT INTO [GoldenEnrollment] ([Id], [StudentId], [CourseId]) VALUES (14, 1, 1);
+INSERT INTO [GoldenEnrollment] ([Id], [StudentId], [CourseId]) VALUES (15, 8, 3);
+INSERT INTO [GoldenEnrollment] ([Id], [StudentId], [CourseId]) VALUES (16, 5, 4);
+INSERT INTO [GoldenEnrollment] ([Id], [StudentId], [CourseId]) VALUES (17, 4, 3);
+INSERT INTO [GoldenEnrollment] ([Id], [StudentId], [CourseId]) VALUES (18, 3, 2);
+INSERT INTO [GoldenEnrollment] ([Id], [StudentId], [CourseId]) VALUES (19, 8, 5);
+INSERT INTO [GoldenEnrollment] ([Id], [StudentId], [CourseId]) VALUES (20, 6, 3);

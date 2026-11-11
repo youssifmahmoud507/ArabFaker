@@ -1,0 +1,122 @@
+[
+  {
+    "Id": 1,
+    "FirstName": "مصطفى",
+    "LastName": "عبدالله",
+    "NationalId": "03436460056098",
+    "Department": "الإدارة العليا",
+    "JobTitle": "مهندس سلامة",
+    "BloodType": "B-",
+    "Bank": "بنك الإسكندرية"
+  },
+  {
+    "Id": 2,
+    "FirstName": "سهير",
+    "LastName": "حميدة",
+    "NationalId": "32894415828457",
+    "Department": "المشتريات",
+    "JobTitle": "مسؤول مشتريات",
+    "BloodType": "A+",
+    "Bank": "بنك قطر الوطني مصر"
+  },
+  {
+    "Id": 3,
+    "FirstName": "فيروز",
+    "LastName": "النجار",
+    "NationalId": "05130978797108",
+    "Department": "الشؤون القانونية",
+    "JobTitle": "فني تجميع",
+    "BloodType": "B-",
+    "Bank": "بنك المشرق"
+  },
+  {
+    "Id": 4,
+    "FirstName": "لجين",
+    "LastName": "مصطفى",
+    "NationalId": "73493383976502",
+    "Department": "النقل واللوجستيات",
+    "JobTitle": "موظف استقبال",
+    "BloodType": "O+",
+    "Bank": "بنك القاهرة"
+  },
+  {
+    "Id": 5,
+    "FirstName": "سعيد",
+    "LastName": "الجندي",
+    "NationalId": "10253191978079",
+    "Department": "النقل واللوجستيات",
+    "JobTitle": "مدير مشروع",
+    "BloodType": "A+",
+    "Bank": "بنك الكويت الوطني مصر"
+  },
+  {
+    "Id": 6,
+    "FirstName": "مؤمن",
+    "LastName": "موسى",
+    "NationalId": "94980564318099",
+    "Department": "التسويق",
+    "JobTitle": "مهندس بحث وتطوير",
+    "BloodType": "B-",
+    "Bank": "المصرف المتحد"
+  },
+  {
+    "Id": 7,
+    "FirstName": "عصام",
+    "LastName": "محمد",
+    "NationalId": "96803643833970",
+    "Department": "العمليات",
+    "JobTitle": "أخصائي استقطاب",
+    "BloodType": "A+",
+    "Bank": "بنك المؤسسة العربية المصرفية مصر"
+  },
+  {
+    "Id": 8,
+    "FirstName": "سلمى",
+    "LastName": "معوض",
+    "NationalId": "69804511599758",
+    "Department": "الإنتاج",
+    "JobTitle": "محلل عمليات",
+    "BloodType": "A-",
+    "Bank": "بنك الإسكندرية"
+  },
+  {
+    "Id": 9,
+    "FirstName": "ريتاج",
+    "LastName": "عامر",
+    "NationalId": "44872246222740",
+    "Department": "البحث والتطوير",
+    "JobTitle": "أمين مكتبة",
+    "BloodType": "O+",
+    "Bank": "بنك المشرق"
+  },
+  {
+    "Id": 10,
+    "FirstName": "سعيد",
+    "LastName": "حمدان",
+    "NationalId": "73217365847802",
+    "Department": "البحث والتطوير",
+    "JobTitle": "مسؤول أمن",
+    "BloodType": "B+",
+    "Bank": "كريدي أجريكول مصر"
+  },
+  {
+    "Id": 11,
+    "FirstName": "رمضان",
+    "LastName": "رضوان",
+    "NationalId": "64986967873377",
+    "Department": "الإعلام والاتصال",
+    "JobTitle": "مذيع",
+    "BloodType": "B-",
+    "Bank": "بنك الإسكندرية"
+  },
+  {
+    "Id": 12,
+    "FirstName": "مؤمن",
+    "LastName": "خليل",
+    "NationalId": "88079016665008",
+    "Department": "الرعاية الصحية",
+    "JobTitle": "مراقب جودة",
+    "BloodType": "A+",
+    "Bank": "البنك التجاري الدولي"
+  }
+]
