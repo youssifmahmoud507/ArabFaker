@@ -1,6 +1,7 @@
 <Solution>
   <Project Path="ArabFaker.NET/ArabFaker.NET.csproj" />
   <Project Path="ArabFaker.Tests/ArabFaker.Tests.csproj" />
+  <Project Path="benchmarks/ArabFaker.Benchmarks/ArabFaker.Benchmarks.csproj" />
   <Project Path="samples/ArabFaker.DatabaseDemo/ArabFaker.DatabaseDemo.csproj" />
   <Project Path="samples/ArabFaker.QuickStart/ArabFaker.QuickStart.csproj" />
   <Project Path="samples/ArabFaker.SqlServerDemo/ArabFaker.SqlServerDemo.csproj" />
