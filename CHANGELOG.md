@@ -23,6 +23,13 @@ versions below `1.0.0` may change the public API.
   (time zones / globalization), mutation testing, link check and a code-quality report. Releases carry build provenance and an SBOM.
 - Export security tests: hostile text round-trips through a real SQLite database, JSON and CSV.
 
+### Testing
+
+- Golden-file tests pin the output of seed 2026 (people, employees with reference data, related tables in SQL Server and
+  MySQL dialects) and the full public API list. See `docs/GOLDEN-FILES.md`.
+- `Update golden files` workflow regenerates them on a feature branch.
+- `benchmarks/ArabFaker.Benchmarks` (BenchmarkDotNet): generation and export of 1,000 and 100,000 rows.
+
 ### Documentation
 
 - XML `summary` comments on every internal type and on the remaining public members (random engine, seed derivation,

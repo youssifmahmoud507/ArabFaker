@@ -1,0 +1,44 @@
+name: Update golden files
+
+# Run this by hand (Actions > Update golden files > Run workflow) on a feature branch, never on master.
+# It regenerates ArabFaker.Tests/Golden/* (the pinned seed outputs and the public API list) and commits them to
+# that branch, so the change shows up as a normal diff in the pull request. Review the diff: every changed line is
+# a change in what a seed produces or in the public API.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    if: github.ref_name != 'master'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Regenerate the golden files
+        env:
+          ARABFAKER_UPDATE_GOLDEN: "1"
+        run: dotnet test ArabFaker.Tests/ArabFaker.Tests.csproj --configuration Release --filter "FullyQualifiedName~GoldenOutputTests|FullyQualifiedName~PublicApiSurfaceTests"
+
+      - name: Commit the changes to this branch
+        env:
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ArabFaker.Tests/Golden
+          if git diff --cached --quiet; then
+            echo "Golden files are already up to date."
+          else
+            git commit -m "Update golden files"
+            git push origin "HEAD:$BRANCH"
+          fi

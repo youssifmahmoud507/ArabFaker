@@ -65,3 +65,4 @@ dotnet add package ArabFaker.NET --version 0.1.0-preview.1 --source ../../artifa
 > لا تضع مفتاح NuGet في الكود أو في ملفات الريبو. استخدم GitHub Secrets إن أضفت Workflow للنشر لاحقًا.
 
 - [ ] Workflows الأمان الجديدة (fuzz, workflow-audit, reproducible-build, quality) شغالة؛ workflow-audit و quality معلوماتية ومش بتوقف الـ PR.
+- [ ] Golden files مطابقة للكود (`GoldenOutputTests` و`PublicApiSurfaceTests` خضرا)، وأي تغيير فيهم متسجل في الـ CHANGELOG (شوف `docs/GOLDEN-FILES.md`).
