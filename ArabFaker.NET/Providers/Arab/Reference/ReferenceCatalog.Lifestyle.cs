@@ -2,7 +2,7 @@
 {
     /// <summary>
     /// Lifestyle and general-knowledge reference lists: nationalities, school subjects, sports, hobbies, food,
-animals, calendars, car brands, programming languages and similar.
+    /// animals, calendars, car brands, programming languages and similar.
     /// The values are test data only; changing a list changes the output for the same seed.
     /// </summary>
     internal static partial class ReferenceCatalog
